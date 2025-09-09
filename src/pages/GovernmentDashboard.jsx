@@ -44,6 +44,7 @@ export default function GovernmentDashboard() {
         setPriorityIssues([
           { id: 1, title: "Major water pipeline leak", sector: "Water Supply", daysOpen: 5 },
           { id: 2, title: "Bridge structural damage", sector: "Roads", daysOpen: 3 },
+          { id: 3, title: "Power outage in downtown area", sector: "Electricity", daysOpen: 2 },
         ]);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -78,18 +79,10 @@ export default function GovernmentDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-100 to-blue-200">
       <NavBarGov />
-      <div className="p-6">
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-3xl font-bold text-blue-900 mb-6 text-center"
-        >
-          Government Dashboard
-        </motion.h1>
-
+      <div className="p-6 pt-4">
         {/* Time Filter */}
-        <div className="flex justify-end mb-6">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold text-blue-900">Performance Overview</h2>
           <div className="bg-white rounded-lg p-1 shadow-sm">
             {['7d', '30d', '90d', 'ytd'].map(period => (
               <button
