@@ -1,10 +1,13 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { motion } from "framer-motion";
 import { reportedIssues } from "../../data/fakeData";
+import NavBarGov from "../Gov/NavBarGov";
 
 export default function MapView() {
   return (
+    
     <div className="min-h-screen bg-gradient-to-r from-purple-100 to-purple-200 p-6">
+      <NavBarGov />
       <motion.h1
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
