@@ -141,7 +141,7 @@ const CivicConnectLogin = () => {
                   </label>
                   <div className="flex border-2 border-gray-300 rounded-lg overflow-hidden bg-white">
                     <div className="px-4 py-3 bg-gray-100 border-r-2 border-gray-300 font-medium">
-                      +1
+                      +91
                     </div>
                     <input
                       type="tel"
