@@ -1,6 +1,5 @@
-// src/pages/Login.jsx - Complete updated version
+// src/pages/Login.jsx - Updated version without Firebase
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { 
   FaUser, 
   FaBuilding, 
@@ -25,7 +24,6 @@ const Login = () => {
     type: 'success' 
   });
   const [countdown, setCountdown] = useState(0);
-  const { signInWithPhone, verifyOtp } = useAuth();
 
   useEffect(() => {
     if (countdown > 0) {
@@ -58,16 +56,16 @@ const Login = () => {
     }
     
     try {
-      // Format phone number with country code (India +91)
-      const formattedPhone = `+91${phoneNumber.replace(/\D/g, '')}`;
-      await signInWithPhone(formattedPhone);
-      setActiveScreen('otp');
-      setCountdown(30); // 30-second countdown for resend
-      showNotification(`Verification code sent to your phone for ${loginType} login!`);
+      // Simulate OTP sending
+      setTimeout(() => {
+        setActiveScreen('otp');
+        setCountdown(30); // 30-second countdown for resend
+        showNotification(`Verification code sent to your phone for ${loginType} login!`);
+        setLoading(false);
+      }, 1000);
     } catch (error) {
       console.error('Error sending OTP:', error);
       showNotification('Failed to send OTP. Please try again.', 'error');
-    } finally {
       setLoading(false);
     }
   };
@@ -76,20 +74,37 @@ const Login = () => {
     e.preventDefault();
     
     // Validate OTP
-    if (!otp || otp.length !== 6) {
-      showNotification('Please enter a valid 6-digit OTP', 'error');
+    if (!otp || otp.length !== 4) {
+      showNotification('Please enter a valid 4-digit OTP', 'error');
       return;
     }
     
     setLoading(true);
     
     try {
-      await verifyOtp(otp);
-      showNotification('Login successful! Redirecting...');
+      // Check if OTP matches the fixed value (2227)
+      if (otp === '2227') {
+        // Simulate successful login
+        setTimeout(() => {
+          showNotification('Login successful! Redirecting...');
+          
+          // Store login info in localStorage
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('userType', loginType);
+          localStorage.setItem('phoneNumber', phoneNumber);
+          
+          // Redirect based on user type
+          setTimeout(() => {
+            window.location.href = loginType === 'citizen' ? '/citizen' : '/government';
+          }, 1500);
+        }, 1000);
+      } else {
+        showNotification('Invalid OTP. Please try again.', 'error');
+        setLoading(false);
+      }
     } catch (error) {
       console.error('Error verifying OTP:', error);
       showNotification('Invalid OTP. Please try again.', 'error');
-    } finally {
       setLoading(false);
     }
   };
@@ -99,14 +114,15 @@ const Login = () => {
     
     setLoading(true);
     try {
-      const formattedPhone = `+91${phoneNumber.replace(/\D/g, '')}`;
-      await signInWithPhone(formattedPhone);
-      setCountdown(30);
-      showNotification('New verification code sent!');
+      // Simulate OTP resending
+      setTimeout(() => {
+        setCountdown(30);
+        showNotification('New verification code sent!');
+        setLoading(false);
+      }, 1000);
     } catch (error) {
       console.error('Error resending OTP:', error);
       showNotification('Failed to resend OTP. Please try again.', 'error');
-    } finally {
       setLoading(false);
     }
   };
@@ -344,7 +360,7 @@ const Login = () => {
                     </div>
                     <h2 className="text-2xl font-bold text-gray-800 mb-2">Enter Verification Code</h2>
                     <p className="text-gray-600">
-                      We've sent a 6-digit code to <span className="font-medium">+91 {phoneNumber}</span>
+                      We've sent a 4-digit code to <span className="font-medium">+91 {phoneNumber}</span>
                     </p>
                   </div>
                   
@@ -357,12 +373,12 @@ const Login = () => {
                         type="text"
                         id="otp"
                         value={otp}
-                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))}
                         className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg outline-none bg-white focus:border-blue-500 text-center text-xl font-semibold tracking-widest"
-                        placeholder="Enter 6-digit code"
+                        placeholder="Enter 4-digit code"
                         required
-                        maxLength="6"
-                        pattern="[0-9]{6}"
+                        maxLength="4"
+                        pattern="[0-9]{4}"
                       />
                     </div>
                     
@@ -423,9 +439,6 @@ const Login = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      
-      {/* reCAPTCHA container */}
-      <div id="recaptcha-container"></div>
     </div>
   );
 };
