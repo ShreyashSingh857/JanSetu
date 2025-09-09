@@ -1,7 +1,18 @@
 import React, { useState } from 'react';
+import { 
+  FaLock, 
+  FaUsers, 
+  FaFlag, 
+  FaChartLine, 
+  FaMobileAlt,
+  FaArrowLeft,
+  FaCheckCircle,
+  FaUser,
+  FaBuilding 
+} from 'react-icons/fa';
 
 const CivicConnectLogin = () => {
-  const [activeScreen, setActiveScreen] = useState('type'); // Start with login type selection
+  const [activeScreen, setActiveScreen] = useState('type');
   const [loginType, setLoginType] = useState('');
   const [notification, setNotification] = useState({ message: '', visible: false });
 
@@ -45,15 +56,15 @@ const CivicConnectLogin = () => {
             
             <div className="space-y-4 mb-8">
               {[
-                { icon: 'lock', text: 'Secure Platform' },
-                { icon: 'users', text: 'Community Driven' },
-                { icon: 'flag', text: 'Report Issues' },
-                { icon: 'chart-line', text: 'Track Progress' },
-                { icon: 'mobile-alt', text: 'Mobile First' }
+                { icon: <FaLock className="text-white" />, text: 'Secure Platform' },
+                { icon: <FaUsers className="text-white" />, text: 'Community Driven' },
+                { icon: <FaFlag className="text-white" />, text: 'Report Issues' },
+                { icon: <FaChartLine className="text-white" />, text: 'Track Progress' },
+                { icon: <FaMobileAlt className="text-white" />, text: 'Mobile First' }
               ].map((feature, index) => (
                 <div key={index} className="flex items-center">
                   <div className="w-8 h-8 rounded-full bg-white bg-opacity-20 flex items-center justify-center mr-4">
-                    <i className={`fas fa-${feature.icon} text-white`}></i>
+                    {feature.icon}
                   </div>
                   <span>{feature.text}</span>
                 </div>
@@ -91,7 +102,10 @@ const CivicConnectLogin = () => {
                     className="border-2 border-gray-200 rounded-xl p-5 cursor-pointer hover:border-blue-500 hover:shadow-md transition-all bg-white"
                     onClick={() => handleLoginTypeSelect('citizen')}
                   >
-                    <h3 className="text-lg font-bold text-blue-600 mb-2">Citizen Login</h3>
+                    <div className="flex items-center mb-2">
+                      <FaUser className="text-blue-600 mr-2" />
+                      <h3 className="text-lg font-bold text-blue-600">Citizen Login</h3>
+                    </div>
                     <p className="text-gray-600">
                       Report issues, track progress, and engage with your community. Access base features for civic engagement.
                     </p>
@@ -101,7 +115,10 @@ const CivicConnectLogin = () => {
                     className="border-2 border-gray-200 rounded-xl p-5 cursor-pointer hover:border-blue-500 hover:shadow-md transition-all bg-white"
                     onClick={() => handleLoginTypeSelect('government')}
                   >
-                    <h3 className="text-lg font-bold text-blue-600 mb-2">Government Login</h3>
+                    <div className="flex items-center mb-2">
+                      <FaBuilding className="text-blue-600 mr-2" />
+                      <h3 className="text-lg font-bold text-blue-600">Government Login</h3>
+                    </div>
                     <p className="text-gray-600">
                       Access government dashboard to manage and resolve reported issues. Specialized tools for authorities.
                     </p>
@@ -122,7 +139,7 @@ const CivicConnectLogin = () => {
                   className="flex items-center text-blue-600 font-medium mb-6"
                   onClick={handleBackToTypeSelection}
                 >
-                  <i className="fas fa-arrow-left mr-2"></i> Back to Login Options
+                  <FaArrowLeft className="mr-2" /> Back to Login Options
                 </button>
                 
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">
@@ -153,7 +170,7 @@ const CivicConnectLogin = () => {
                 </div>
                 
                 <button 
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center"
                   onClick={handleContinueWithPhone}
                 >
                   Continue with Phone
@@ -171,8 +188,8 @@ const CivicConnectLogin = () => {
       
       {/* Notification */}
       {notification.visible && (
-        <div className="fixed top-5 right-5 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300">
-          {notification.message}
+        <div className="fixed top-5 right-5 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300 flex items-center">
+          <FaCheckCircle className="mr-2" /> {notification.message}
         </div>
       )}
     </div>

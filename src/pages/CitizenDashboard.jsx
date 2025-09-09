@@ -1,7 +1,8 @@
+// CitizenDashboard.jsx
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import Navbar from "../components/Citizen/NavBarCitizen";
-import IssueCard from "../components/Citizen/IssueCard";
+import NavBarCitizen from "../components/Citizen/NavBarCitizen";
+import IssueDisplayCard from "../components/Citizen/IssueDisplayCard"; // Changed from IssueCard to IssueDisplayCard
 import MapView1 from "../components/Citizen/MapView1";
 import { issues, stats, trendData } from "../components/Citizen/dummyData";
 import {
@@ -15,11 +16,11 @@ import {
 } from "recharts";
 
 const CitizenDashboard = () => {
-  const [activeTab, setActiveTab] = useState("reported");
+  const [activeTab, setActiveTab] = useState("Reported");
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-gray-100 to-gray-200">
-      <Navbar />
+      <NavBarCitizen />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Title */}
@@ -70,7 +71,7 @@ const CitizenDashboard = () => {
             <div className="bg-white rounded-2xl shadow-lg">
               <div className="border-b border-gray-200">
                 <nav className="flex -mb-px">
-                  {["reported", "in progress", "resolved"].map((tab) => (
+                  {["Reported", "In Progress", "Resolved"].map((tab) => (
                     <button
                       key={tab}
                       className={`mr-8 py-4 px-1 text-sm font-medium border-b-2 ${
@@ -80,9 +81,7 @@ const CitizenDashboard = () => {
                       }`}
                       onClick={() => setActiveTab(tab)}
                     >
-                      {tab === "reported" && "Reported Issues"}
-                      {tab === "in progress" && "In Progress"}
-                      {tab === "resolved" && "Resolved"}
+                      {tab}
                     </button>
                   ))}
                 </nav>
@@ -90,20 +89,15 @@ const CitizenDashboard = () => {
 
               <div className="p-6">
                 {issues
-                  .filter(
-                    (issue) =>
-                      issue.status.toLowerCase() === activeTab.toLowerCase()
-                  )
+                  .filter((issue) => issue.status === activeTab)
                   .map((issue) => (
-                    <IssueCard key={issue.id} issue={issue} />
+                    <IssueDisplayCard key={issue.id} issue={issue} />
                   ))}
 
-                {issues.filter(
-                  (issue) =>
-                    issue.status.toLowerCase() === activeTab.toLowerCase()
-                ).length === 0 && (
+                {issues.filter((issue) => issue.status === activeTab).length ===
+                  0 && (
                   <div className="text-center py-12 text-gray-500">
-                    No {activeTab} issues found
+                    No {activeTab.toLowerCase()} issues found
                   </div>
                 )}
               </div>

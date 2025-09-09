@@ -12,7 +12,6 @@ import 'leaflet/dist/leaflet.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import "@fortawesome/fontawesome-free/css/all.min.css";
 
 
 export default function App() {
