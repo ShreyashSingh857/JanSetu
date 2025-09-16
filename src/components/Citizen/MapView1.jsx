@@ -1,7 +1,8 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, useMap, LayersControl, Marker, Popup, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import 'leaflet.heat';
 import NavBarCitizen from "./NavBarCitizen";
 
 // Fix for default markers in react-leaflet
@@ -12,32 +13,115 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Custom icons for different statuses
-const createCustomIcon = (status) => {
-  let className = '';
-  let iconClass = '';
-
-  switch(status) {
-    case 'Resolved':
-      className = 'bg-green-500 border-green-600';
-      iconClass = 'fas fa-check-circle';
-      break;
-    case 'In Progress':
-      className = 'bg-blue-500 border-blue-600';
-      iconClass = 'fas fa-tools';
-      break;
-    case 'Pending':
-    default:
-      className = 'bg-yellow-500 border-yellow-600';
-      iconClass = 'fas fa-clock';
-  }
-
-  return L.divIcon({
-    html: `<div class="w-8 h-8 rounded-full flex items-center justify-center text-white ${className} border-2 shadow-md"><i class="${iconClass} text-sm"></i></div>`,
-    className: 'custom-marker',
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
+// Custom marker icons for different issue types
+const createCustomIcon = (category) => {
+  const iconUrl = getIconForCategory(category);
+  return L.icon({
+    iconUrl: iconUrl,
+    iconSize: [25, 25],
+    iconAnchor: [12, 12],
+    popupAnchor: [0, -12]
   });
+};
+
+const getIconForCategory = (category) => {
+  const icons = {
+    'Roads': '🚧',
+    'Water Supply': '💧',
+    'Electricity': '⚡',
+    'Sanitation': '🗑️',
+    'Public Transport': '🚌'
+  };
+  const emoji = icons[category] || '📍';
+  
+  // Use encodeURIComponent instead of btoa for Unicode characters
+  const svgString = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25">
+      <circle cx="12.5" cy="12.5" r="12" fill="white" stroke="black" stroke-width="1"/>
+      <text x="12.5" y="16" font-size="12" text-anchor="middle">${emoji}</text>
+    </svg>
+  `;
+  
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svgString)}`;
+};
+
+// Marker component for individual issues
+const IssueMarker = ({ issue }) => {
+  const map = useMap();
+  
+  const marker = useMemo(() => {
+    const icon = createCustomIcon(issue.category);
+    return L.marker([issue.lat, issue.lng], { icon });
+  }, [issue]);
+  
+  useEffect(() => {
+    marker.addTo(map);
+    
+    marker.bindPopup(`
+      <div class="p-2">
+        <h3 class="font-semibold">${issue.title}</h3>
+        <p class="text-sm">${issue.description}</p>
+        <p class="text-xs mt-1">Status: ${issue.status}</p>
+      </div>
+    `);
+    
+    return () => {
+      marker.remove();
+    };
+  }, [map, marker, issue]);
+  
+  return null;
+};
+
+// Heatmap layer component
+const HeatmapLayer = ({ data, intensityType }) => {
+  const map = useMap();
+  
+  useEffect(() => {
+    // Remove existing heatmap layers
+    map.eachLayer(layer => {
+      if (layer instanceof L.HeatLayer) {
+        map.removeLayer(layer);
+      }
+    });
+
+    if (data.length === 0) return;
+
+    const heatmapPoints = data.map(issue => {
+      let intensity;
+      
+      if (intensityType === 'urgency') {
+        intensity = issue.urgency === 'Critical' ? 1.0 : 
+                   issue.urgency === 'High' ? 0.7 :
+                   issue.urgency === 'Medium' ? 0.4 : 0.2;
+      } else if (intensityType === 'status') {
+        intensity = issue.status === 'Pending' ? 0.2 :
+                   issue.status === 'In Progress' ? 0.5 : 0.8;
+      } else if (intensityType === 'points') {
+        intensity = Math.min(issue.points / 50, 1.0);
+      }
+      
+      return [issue.lat, issue.lng, intensity];
+    });
+
+    if (L.heatLayer) {
+      L.heatLayer(heatmapPoints, {
+        radius: 25,
+        blur: 15,
+        maxZoom: 17,
+        gradient: {
+          0.2: 'blue',
+          0.4: 'cyan',
+          0.6: 'lime',
+          0.8: 'yellow',
+          1.0: 'red'
+        }
+      }).addTo(map);
+    }
+
+  }, [data, map, intensityType]);
+
+  return null;
 };
 
 // Map controller component for fitting bounds
@@ -54,22 +138,30 @@ const MapController = ({ issues }) => {
   return null;
 };
 
+// Component to handle double-click events
+const MapDoubleClickHandler = ({ onDoubleClick }) => {
+  useMapEvents({
+    dblclick: (e) => {
+      onDoubleClick(e);
+    }
+  });
+  return null;
+};
+
 // Filter controls component with collapsible feature
 const MapFilters = ({ filters, setFilters, categories }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   return (
-    <div className="absolute top-4 left-4 z-[1000] bg-white rounded-lg shadow-md">
-      {/* Toggle Button */}
+    <div className="absolute bottom-4 left-4 z-[1000] bg-white rounded-lg shadow-md">
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
         className="w-full p-3 bg-blue-500 text-white rounded-t-lg flex items-center justify-between hover:bg-blue-600 transition-colors"
       >
         <span className="font-semibold">Filter Issues</span>
-        <i className={`fas ${isCollapsed ? 'fa-chevron-down' : 'fa-chevron-up'} text-sm`}></i>
+        <span className="text-sm">{isCollapsed ? '▼' : '▲'}</span>
       </button>
 
-      {/* Filter Content */}
       {!isCollapsed && (
         <div className="p-4 max-w-xs">
           <div className="space-y-3">
@@ -100,17 +192,15 @@ const MapFilters = ({ filters, setFilters, categories }) => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Urgency:</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Heatmap Intensity:</label>
               <select 
-                value={filters.urgency} 
-                onChange={(e) => setFilters({...filters, urgency: e.target.value})}
+                value={filters.intensity} 
+                onChange={(e) => setFilters({...filters, intensity: e.target.value})}
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="All">All Urgency Levels</option>
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-                <option value="Critical">Critical</option>
+                <option value="urgency">By Urgency</option>
+                <option value="status">By Status</option>
+                <option value="points">By Points</option>
               </select>
             </div>
           </div>
@@ -120,7 +210,7 @@ const MapFilters = ({ filters, setFilters, categories }) => {
   );
 };
 
-// Dummy data (replace with your actual data source)
+// Dummy data
 const issues = [
   {
     id: 1,
@@ -198,7 +288,7 @@ export default function MapView() {
   const [filters, setFilters] = useState({
     status: 'All',
     category: 'All',
-    urgency: 'All'
+    intensity: 'urgency'
   });
 
   // Get unique categories from issues
@@ -209,11 +299,25 @@ export default function MapView() {
     return issues.filter(issue => {
       return (
         (filters.status === 'All' || issue.status === filters.status) &&
-        (filters.category === 'All' || issue.category === filters.category) &&
-        (filters.urgency === 'All' || issue.urgency === filters.urgency)
+        (filters.category === 'All' || issue.category === filters.category)
       );
     });
   }, [filters]);
+
+  // Handle double click to set location and redirect
+  const handleMapDoubleClick = useCallback((e) => {
+    const { lat, lng } = e.latlng;
+    
+    // Store the location in localStorage
+    localStorage.setItem('issueLocation', JSON.stringify({
+      lat,
+      lng,
+      address: `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`
+    }));
+    
+    // Redirect to issue reporting page
+    window.location.href = '/issuecard';
+  }, []);
 
   return (
     <div className="relative w-full h-screen">
@@ -224,12 +328,16 @@ export default function MapView() {
         zoom={12}
         className="w-full h-full"
         zoomControl={true}
+        doubleClickZoom={false} // Disable default double-click zoom
       >
         <MapFilters 
           filters={filters} 
           setFilters={setFilters} 
           categories={categories} 
         />
+        
+        <MapDoubleClickHandler onDoubleClick={handleMapDoubleClick} />
+        
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -237,61 +345,37 @@ export default function MapView() {
         
         <MapController issues={filteredIssues} />
         
-        {/* Render individual markers for each issue */}
+        <HeatmapLayer data={filteredIssues} intensityType={filters.intensity} />
+        
         {filteredIssues.map(issue => (
-          <Marker
-            key={issue.id}
-            position={[issue.lat, issue.lng]}
-            icon={createCustomIcon(issue.status)}
-          >
-            <Popup>
-              <div className="w-64">
-                <h3 className="font-semibold text-gray-800">{issue.title}</h3>
-                <div className="mt-2 space-y-1 text-sm">
-                  <p><span className="font-medium">Category:</span> {issue.category}</p>
-                  <p>
-                    <span className="font-medium">Status:</span> 
-                    <span className={`ml-1 px-2 py-0.5 rounded-full text-xs font-medium ${
-                      issue.status === 'Resolved' ? 'bg-green-100 text-green-800' :
-                      issue.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
-                      'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {issue.status}
-                    </span>
-                  </p>
-                  <p>
-                    <span className="font-medium">Urgency:</span> 
-                    <span className={`ml-1 px-2 py-0.5 rounded-full text-xs font-medium ${
-                      issue.urgency === 'Critical' ? 'bg-red-100 text-red-800' :
-                      issue.urgency === 'High' ? 'bg-orange-100 text-orange-800' :
-                      issue.urgency === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-blue-100 text-blue-800'
-                    }`}>
-                      {issue.urgency}
-                    </span>
-                  </p>
-                  <p><span className="font-medium">Reported:</span> {new Date(issue.date).toLocaleDateString()}</p>
-                  <p><span className="font-medium">Location:</span> {issue.location}</p>
-                </div>
-                {issue.image && (
-                  <div className="mt-2">
-                    <img src={issue.image} alt={issue.title} className="w-full h-32 object-cover rounded-md" />
-                  </div>
-                )}
-                <p className="mt-2 text-sm text-gray-600">{issue.description}</p>
-                <div className="mt-3 flex justify-between items-center">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    +{issue.points} pts
-                  </span>
-                  <button className="px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 transition-colors">
-                    View Details
-                  </button>
-                </div>
-              </div>
-            </Popup>
-          </Marker>
+          <IssueMarker key={issue.id} issue={issue} />
         ))}
+        
       </MapContainer>
+      
+      {/* Heatmap Legend */}
+      <div className="absolute bottom-4 right-4 z-[1000] bg-white p-4 rounded-lg shadow-md">
+        <h3 className="font-semibold text-gray-800 mb-2">Heatmap Legend</h3>
+        <div className="space-y-2">
+          <div className="flex items-center">
+            <div className="w-4 h-4 bg-red-500 mr-2"></div>
+            <span className="text-sm">High Intensity</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-4 h-4 bg-yellow-500 mr-2"></div>
+            <span className="text-sm">Medium Intensity</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-4 h-4 bg-blue-500 mr-2"></div>
+            <span className="text-sm">Low Intensity</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Double-click instruction */}
+      <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-[1000] bg-blue-100 text-blue-800 px-4 py-2 rounded-md text-sm">
+        Double-click on the map to report an issue at that location
+      </div>
     </div>
   );
 }

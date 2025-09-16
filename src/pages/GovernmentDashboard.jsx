@@ -1,28 +1,40 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import NavBarGov from "../components/Gov/NavBarGov";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
   Tooltip,
   Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell
-} from "recharts";
-import NavBarGov from "../components/Gov/NavBarGov";
+  ArcElement,
+} from 'chart.js';
+import { Bar, Line } from 'react-chartjs-2';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
+);
 
 export default function GovernmentDashboard() {
   const [sectors, setSectors] = useState([]);
-  const [activeSector, setActiveSector] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timeFilter, setTimeFilter] = useState('30d');
   const [priorityIssues, setPriorityIssues] = useState([]);
+  const [trendData, setTrendData] = useState(null);
+  const [comparisonData, setComparisonData] = useState(null);
 
   useEffect(() => {
     // Simulate API fetch
@@ -38,7 +50,6 @@ export default function GovernmentDashboard() {
         ];
         
         setSectors(sectorData);
-        setActiveSector(sectorData[0]);
         
         // Simulate priority issues
         setPriorityIssues([
@@ -46,6 +57,53 @@ export default function GovernmentDashboard() {
           { id: 2, title: "Bridge structural damage", sector: "Roads", daysOpen: 3 },
           { id: 3, title: "Power outage in downtown area", sector: "Electricity", daysOpen: 2 },
         ]);
+
+        // Prepare trend data
+        setTrendData({
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+          datasets: [
+            {
+              label: 'Reported Issues',
+              data: [380, 420, 395, 460, 435, 410, 460],
+              borderColor: 'rgba(52, 152, 219, 1)',
+              backgroundColor: 'rgba(52, 152, 219, 0.1)',
+              tension: 0.3,
+              fill: true,
+              borderWidth: 2
+            },
+            {
+              label: 'Resolved Issues',
+              data: [290, 320, 310, 355, 340, 330, 355],
+              borderColor: 'rgba(46, 204, 113, 1)',
+              backgroundColor: 'rgba(46, 204, 113, 0.1)',
+              tension: 0.3,
+              fill: true,
+              borderWidth: 2
+            }
+          ]
+        });
+
+        // Prepare comparison data
+        setComparisonData({
+          labels: sectorData.map(s => s.name),
+          datasets: [
+            {
+              label: 'Reported Issues',
+              data: sectorData.map(s => s.issues),
+              backgroundColor: 'rgba(52, 152, 219, 0.7)',
+              borderColor: 'rgba(52, 152, 219, 1)',
+              borderWidth: 1
+            },
+            {
+              label: 'Resolved Issues',
+              data: sectorData.map(s => s.resolved),
+              backgroundColor: 'rgba(46, 204, 113, 0.7)',
+              borderColor: 'rgba(46, 204, 113, 1)',
+              borderWidth: 1
+            }
+          ]
+        });
+
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -71,212 +129,309 @@ export default function GovernmentDashboard() {
   const totalResolved = sectors.reduce((sum, sector) => sum + sector.resolved, 0);
   const overallResolutionRate = Math.round((totalResolved / totalIssues) * 100);
   
-  const resolutionRateData = sectors.map(sector => ({
-    name: sector.shortName,
-    value: Math.round((sector.resolved / sector.issues) * 100)
-  }));
+  const roadsSector = sectors.find(s => s.name === "Roads") || {issues: 0, resolved: 0};
+  const roadsResolutionRate = Math.round((roadsSector.resolved / roadsSector.issues) * 100);
+
+  // Chart options
+  const trendOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Monthly Performance Trends'
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Number of Issues'
+        }
+      }
+    }
+  };
+
+  const comparisonOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Performance Across Service Sectors'
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Number of Issues'
+        }
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-100 to-blue-200">
       <NavBarGov />
-      <div className="p-6 pt-4">
-        {/* Time Filter */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-blue-900">Performance Overview</h2>
-          <div className="bg-white rounded-lg p-1 shadow-sm">
-            {['7d', '30d', '90d', 'ytd'].map(period => (
-              <button
-                key={period}
-                onClick={() => setTimeFilter(period)}
-                className={`px-3 py-1 rounded-md text-sm ${
-                  timeFilter === period 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {period.toUpperCase()}
-              </button>
-            ))}
+      <div className="container mx-auto p-4">
+        <header className="bg-gradient-to-r from-blue-800 to-blue-900 text-white rounded-2xl p-6 mb-6 shadow-lg flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="text-center md:text-left">
+            <h1 className="text-2xl md:text-3xl font-bold font-montserrat">Municipal Services Performance Dashboard</h1>
+            <p className="text-blue-200 mt-2">Comprehensive overview of citizen reports and service resolution metrics</p>
           </div>
-        </div>
-
-        {/* Summary Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white shadow-lg rounded-2xl p-6 text-center">
-            <div className="text-3xl font-bold text-blue-600">{totalIssues}</div>
-            <div className="text-gray-600">Total Issues</div>
-          </div>
-          <div className="bg-white shadow-lg rounded-2xl p-6 text-center">
-            <div className="text-3xl font-bold text-green-600">{totalResolved}</div>
-            <div className="text-gray-600">Resolved Issues</div>
-          </div>
-          <div className="bg-white shadow-lg rounded-2xl p-6 text-center">
-            <div className="text-3xl font-bold text-purple-600">{overallResolutionRate}%</div>
-            <div className="text-gray-600">Resolution Rate</div>
-          </div>
-        </div>
-
-        {/* Sector Selection Buttons */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8">
-          {sectors.map((sector, idx) => (
-            <button
-              key={idx}
-              onClick={() => setActiveSector(sector)}
-              className={`px-3 py-2 text-sm md:px-6 md:py-2 md:text-base rounded-xl shadow-md transition-all duration-300 ${
-                activeSector.name === sector.name
-                  ? "bg-blue-600 text-white"
-                  : "bg-white text-blue-700 border border-blue-300 hover:bg-blue-100"
-              }`}
-            >
-              {sector.name}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button className="bg-blue-700 bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-full flex items-center gap-2 transition-all">
+              <i className="fas fa-download"></i> Export Report
             </button>
-          ))}
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Column */}
-          <div className="space-y-8">
-            {/* Sector Details */}
-            {activeSector && (
-              <motion.div
-                key={activeSector.name}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="grid grid-cols-1 md:grid-cols-2 gap-6"
-              >
-                <div className="bg-white shadow-lg rounded-2xl p-6">
-                  <h2 className="text-xl font-semibold text-blue-800 mb-3">
-                    {activeSector.name} Issues
-                  </h2>
-                  <p className="text-4xl font-bold text-blue-700">
-                    {activeSector.issues}
-                  </p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Total reports submitted by citizens
-                  </p>
-                </div>
-
-                <div className="bg-white shadow-lg rounded-2xl p-6">
-                  <h2 className="text-xl font-semibold text-green-700 mb-3">
-                    Resolved
-                  </h2>
-                  <p className="text-4xl font-bold text-green-600">
-                    {activeSector.resolved}
-                  </p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Successfully resolved by authorities
-                  </p>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Priority Issues */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="bg-white rounded-2xl shadow-lg p-6"
-            >
-              <h3 className="text-lg font-semibold text-gray-700 mb-4">
-                High Priority Issues
-              </h3>
-              <div className="space-y-3">
-                {priorityIssues.slice(0, 5).map(issue => (
-                  <div key={issue.id} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
-                    <div>
-                      <div className="font-medium">{issue.title}</div>
-                      <div className="text-sm text-gray-600">{issue.sector}</div>
-                    </div>
-                    <div className="text-red-600 font-medium">
-                      {issue.daysOpen} days
-                    </div>
-                  </div>
-                ))}
-                {priorityIssues.length === 0 && (
-                  <div className="text-center text-gray-500 py-4">
-                    No high priority issues
-                  </div>
-                )}
-              </div>
-            </motion.div>
+            <button className="bg-blue-700 bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-full flex items-center gap-2 transition-all">
+              <i className="fas fa-cog"></i> Settings
+            </button>
           </div>
-
-          {/* Right Column */}
-          <div className="space-y-8">
-            {/* Bar Chart for All Sectors */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="bg-white rounded-2xl shadow-lg p-6"
-            >
-              <h2 className="text-lg font-semibold text-gray-700 mb-4">
-                Sector-wise Reported vs Resolved
+        </header>
+        
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
+          {/* Performance Overview Card */}
+          <div className="md:col-span-4 bg-white rounded-2xl p-6 shadow-lg relative overflow-hidden border-t-4 border-blue-500">
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
+              <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                <i className="fas fa-chart-line text-blue-500"></i> Performance Overview
               </h2>
-              <div className="w-full overflow-x-auto">
-                <div className="min-w-[500px]">
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={sectors}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis
-                        dataKey="shortName"
-                        tick={{ fontSize: 12 }}
-                        interval={0}
-                      />
-                      <YAxis />
-                      <Tooltip
-                        formatter={(value, name) => [value, name]}
-                        labelFormatter={(label) => {
-                          const fullSector = sectors.find(
-                            (s) => s.shortName === label
-                          );
-                          return fullSector ? fullSector.name : label;
-                        }}
-                      />
-                      <Legend />
-                      <Bar dataKey="issues" fill="#2563eb" name="Reported Issues" />
-                      <Bar dataKey="resolved" fill="#16a34a" name="Resolved Issues" />
-                    </BarChart>
-                  </ResponsiveContainer>
+              <div className="flex gap-2">
+                <button className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-blue-100 hover:text-blue-600 transition-colors">
+                  <i className="fas fa-sync-alt text-sm"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div className="text-center mb-6">
+              <span className="text-sm text-gray-500 uppercase tracking-wider">Total Issues</span>
+              <div className="text-4xl font-bold text-gray-800 my-2">{totalIssues}</div>
+              <div className="inline-flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                <i className="fas fa-arrow-up"></i> 12% from last month
+              </div>
+            </div>
+            
+            <div className="h-1 bg-gray-200 rounded-full my-6"></div>
+            
+            <div className="text-center">
+              <span className="text-sm text-gray-500 uppercase tracking-wider">Resolved Issues</span>
+              <div className="text-4xl font-bold text-gray-800 my-2">{totalResolved}</div>
+              
+              <div className="h-2 bg-gray-200 rounded-full mt-4 mb-2 overflow-hidden">
+                <div 
+                  className="h-full rounded-full bg-gradient-to-r from-blue-500 to-green-500 relative overflow-hidden"
+                  style={{ width: `${overallResolutionRate}%` }}
+                >
+                  <div className="absolute inset-0 bg-repeat bg-[length:20px_20px] pattern-diagonal-lines opacity-20"></div>
                 </div>
               </div>
-            </motion.div>
-
-            {/* Resolution Rate Pie Chart */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="bg-white rounded-2xl shadow-lg p-6"
-            >
-              <h3 className="text-lg font-semibold text-gray-700 mb-4">
-                Resolution Rate by Sector (%)
-              </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={resolutionRateData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {resolutionRateData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </motion.div>
+              
+              <span className="text-sm text-gray-500">{overallResolutionRate}% Resolution Rate</span>
+            </div>
+          </div>
+          
+          {/* Service Sectors Card */}
+          <div className="md:col-span-4 bg-white rounded-2xl p-6 shadow-lg">
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
+              <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                <i className="fas fa-layer-group text-blue-500"></i> Service Sectors
+              </h2>
+              <div className="flex gap-2">
+                <button className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-blue-100 hover:text-blue-600 transition-colors">
+                  <i className="fas fa-filter text-sm"></i>
+                </button>
+              </div>
+            </div>
+            
+            <ul className="space-y-4">
+              {sectors.map((sector, index) => (
+                <li key={index} className="flex justify-between items-center py-3 border-b border-gray-100 last:border-b-0">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white ${
+                      sector.name === "Roads" ? "bg-gradient-to-br from-blue-500 to-blue-800" :
+                      sector.name === "Water Supply" ? "bg-gradient-to-br from-blue-400 to-blue-600" :
+                      sector.name === "Electricity" ? "bg-gradient-to-br from-yellow-500 to-orange-500" :
+                      sector.name === "Sanitation" ? "bg-gradient-to-br from-green-500 to-green-700" :
+                      "bg-gradient-to-br from-purple-500 to-purple-700"
+                    }`}>
+                      <i className={`fas fa-${sector.name === "Roads" ? "road" : 
+                                      sector.name === "Water Supply" ? "tint" : 
+                                      sector.name === "Electricity" ? "bolt" : 
+                                      sector.name === "Sanitation" ? "trash-alt" : "bus"}`}></i>
+                    </div>
+                    <span className="font-medium text-gray-700">{sector.name}</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-semibold text-gray-800">{sector.issues} issues</div>
+                    <div className="text-sm text-green-600">{sector.resolved} resolved</div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          {/* High Priority Issues Card */}
+          <div className="md:col-span-4 bg-white rounded-2xl p-6 shadow-lg">
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
+              <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                <i className="fas fa-exclamation-circle text-red-500"></i> High Priority Issues
+              </h2>
+              <div className="flex gap-2">
+                <button className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-blue-100 hover:text-blue-600 transition-colors">
+                  <i className="fas fa-ellipsis-h text-sm"></i>
+                </button>
+              </div>
+            </div>
+            
+            {priorityIssues.map(issue => (
+              <div key={issue.id} className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 p-5 rounded-xl mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <i className={`fas fa-${issue.sector === "Roads" ? "road" : 
+                                    issue.sector === "Water Supply" ? "tint" : 
+                                    issue.sector === "Electricity" ? "bolt" : "exclamation-triangle"} text-red-500`}></i>
+                  <div className="font-semibold text-red-700">{issue.title}</div>
+                  <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold ml-auto">PRIORITY</span>
+                </div>
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>{issue.sector}</span>
+                  <span><i className="fas fa-clock mr-1"></i> {issue.daysOpen} days unresolved</span>
+                </div>
+              </div>
+            ))}
+            
+            <div className="text-sm text-gray-500 flex items-center gap-2">
+              <i className="fas fa-info-circle"></i>
+              These issues require immediate attention from department heads.
+            </div>
+          </div>
+          
+          {/* Roads Department Performance Card */}
+          <div className="md:col-span-6 bg-white rounded-2xl p-6 shadow-lg">
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
+              <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                <i className="fas fa-road text-blue-500"></i> Roads Department Performance
+              </h2>
+              <div className="flex gap-2">
+                <button className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-blue-100 hover:text-blue-600 transition-colors">
+                  <i className="fas fa-expand text-sm"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-6 mb-6">
+              <div className="text-center">
+                <span className="text-sm text-gray-500 uppercase tracking-wider">Total Reports</span>
+                <div className="text-3xl font-bold text-gray-800 my-2">{roadsSector.issues}</div>
+                <div className="inline-flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">
+                  <i className="fas fa-arrow-up"></i> 8% from last month
+                </div>
+              </div>
+              
+              <div className="text-center">
+                <span className="text-sm text-gray-500 uppercase tracking-wider">Resolved</span>
+                <div className="text-3xl font-bold text-gray-800 my-2">{roadsSector.resolved}</div>
+                <div className="inline-flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">
+                  <i className="fas fa-arrow-up"></i> 12% from last month
+                </div>
+              </div>
+            </div>
+            
+            <div className="h-2 bg-gray-200 rounded-full mb-2 overflow-hidden">
+              <div 
+                className="h-full rounded-full bg-gradient-to-r from-blue-500 to-green-500 relative overflow-hidden"
+                style={{ width: `${roadsResolutionRate}%` }}
+              >
+                <div className="absolute inset-0 bg-repeat bg-[length:20px_20px] pattern-diagonal-lines opacity-20"></div>
+              </div>
+            </div>
+            
+            <div className="flex justify-between text-sm text-gray-500 mb-4">
+              <span>{roadsResolutionRate}% resolution rate</span>
+              <span>Target: 80%</span>
+            </div>
+            
+            <div className="text-sm text-gray-500 flex items-center gap-2">
+              <i className="fas fa-info-circle"></i>
+              Road issues resolution is {80 - roadsResolutionRate}% below target for this quarter.
+            </div>
+          </div>
+          
+          {/* Resolution Trends Card */}
+          <div className="md:col-span-6 bg-white rounded-2xl p-6 shadow-lg">
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
+              <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                <i className="fas fa-chart-bar text-blue-500"></i> Resolution Trends
+              </h2>
+              <div className="flex gap-2">
+                <button className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-blue-100 hover:text-blue-600 transition-colors">
+                  <i className="fas fa-calendar text-sm"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div className="h-80">
+              {trendData && <Line data={trendData} options={trendOptions} />}
+            </div>
+          </div>
+          
+          {/* Sector Comparison Card */}
+          <div className="md:col-span-12 bg-white rounded-2xl p-6 shadow-lg">
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
+              <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                <i className="fas fa-chart-pie text-blue-500"></i> Sector-wise Reported vs Resolved Issues
+              </h2>
+              <div className="flex gap-2">
+                <button className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-blue-100 hover:text-blue-600 transition-colors">
+                  <i className="fas fa-download text-sm"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div className="h-80">
+              {comparisonData && <Bar data={comparisonData} options={comparisonOptions} />}
+            </div>
           </div>
         </div>
       </div>
+      
+      <style jsx>{`
+        .pattern-diagonal-lines {
+          background-image: linear-gradient(
+            -45deg, 
+            rgba(255, 255, 255, 0.2) 25%, 
+            transparent 25%, 
+            transparent 50%, 
+            rgba(255, 255, 255, 0.2) 50%, 
+            rgba(255, 255, 255, 0.2) 75%, 
+            transparent 75%, 
+            transparent
+          );
+          background-size: 20px 20px;
+          animation: move 1s linear infinite;
+        }
+        
+        @keyframes move {
+          0% {
+            background-position: 0 0;
+          }
+          100% {
+            background-position: 20px 20px;
+          }
+        }
+        
+        .font-montserrat {
+          font-family: 'Montserrat', sans-serif;
+        }
+      `}</style>
     </div>
   );
 }

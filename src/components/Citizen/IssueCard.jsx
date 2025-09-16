@@ -1,5 +1,5 @@
-import React, { useState, useRef } from "react";
-import { FaCamera, FaVideo, FaPaperPlane, FaTimes } from "react-icons/fa";
+import React, { useState, useRef, useEffect } from "react";
+import { FaCamera, FaVideo, FaPaperPlane, FaTimes, FaMapMarkerAlt } from "react-icons/fa";
 import { motion } from "framer-motion";
 import NavBarCitizen from "./NavBarCitizen";
 
@@ -10,12 +10,27 @@ const IssueCard = () => {
   const [category, setCategory] = useState("Road Maintenance");
   const [urgency, setUrgency] = useState("Medium");
   const [media, setMedia] = useState(null);
-  const [mediaType, setMediaType] = useState(null); // 'image' or 'video'
+  const [mediaType, setMediaType] = useState(null);
   const [isCapturing, setIsCapturing] = useState(false);
-  const [captureMode, setCaptureMode] = useState(null); // 'photo' or 'video'
+  const [captureMode, setCaptureMode] = useState(null);
+  const [location, setLocation] = useState("");
+  const [showMapButton, setShowMapButton] = useState(true);
   
   const videoRef = useRef(null);
   const streamRef = useRef(null);
+
+  // Get location from localStorage when component mounts
+  useEffect(() => {
+    const savedLocation = localStorage.getItem('issueLocation');
+    if (savedLocation) {
+      const { lat, lng, address } = JSON.parse(savedLocation);
+      setLocation(`${address} (Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)})`);
+      setShowMapButton(false);
+      
+      // Clear the stored location after use
+      localStorage.removeItem('issueLocation');
+    }
+  }, []);
 
   const startCamera = async (mode) => {
     try {
@@ -88,6 +103,13 @@ const IssueCard = () => {
     setMediaType(null);
   };
 
+  const handleLocationSelect = () => {
+    // Store a flag to indicate we're coming from IssueCard
+    localStorage.setItem('fromIssueCard', 'true');
+    // Navigate to the map selection page
+    window.location.href = '/map-selection'; // Adjust this path as needed
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -102,7 +124,7 @@ const IssueCard = () => {
       mediaType,
       status: "Reported",
       date: new Date().toISOString().split('T')[0],
-      location: "Current Location", // Would use geolocation API in real app
+      location: location || "Location not specified",
       upvotes: 0,
       comments: 0
     };
@@ -119,6 +141,8 @@ const IssueCard = () => {
     setUrgency("Medium");
     setMedia(null);
     setMediaType(null);
+    setLocation("");
+    setShowMapButton(true);
     
     alert("Issue reported successfully!");
   };
@@ -192,6 +216,35 @@ const IssueCard = () => {
                 <option value="Critical">Critical</option>
               </select>
             </div>
+          </div>
+          
+          {/* Location Selection Section */}
+          <div className="mb-6">
+            <label className="block text-gray-700 font-medium mb-2">Issue Location</label>
+            {showMapButton ? (
+              <button
+                type="button"
+                onClick={handleLocationSelect}
+                className="w-full flex items-center justify-center gap-2 p-3 border border-gray-300 rounded-lg hover:bg-blue-50 transition-colors"
+              >
+                <FaMapMarkerAlt className="text-blue-600" />
+                <span>Select Location on Map</span>
+              </button>
+            ) : (
+              <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-blue-800">{location}</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLocation("");
+                    setShowMapButton(true);
+                  }}
+                  className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+                >
+                  Change Location
+                </button>
+              </div>
+            )}
           </div>
           
           {/* Media Capture Section */}

@@ -12,17 +12,25 @@ import {
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell
+  Cell,
+  Legend
 } from "recharts";
 import { progressData, reportedIssues } from "../../data/fakeData";
 import NavBarGov from "../Gov/NavBarGov";
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+const COLORS = ['#4C6FFF', '#43D2FF', '#43D2FF', '#FFBB28', '#FF8042', '#8884D8'];
+const STATUS_COLORS = {
+  'Resolved': '#10B981',
+  'In Progress': '#3B82F6',
+  'Pending': '#F59E0B',
+  'Could Not Be Fixed': '#EF4444'
+};
 
 export default function IssueProgress() {
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [status, setStatus] = useState("Pending");
-  const [currentStage, setCurrentStage] = useState(2); // For demo purposes
+  const [currentStage, setCurrentStage] = useState(2);
+  const [notes, setNotes] = useState("");
 
   // Timeline data for different issue types
   const progressStages = [
@@ -88,6 +96,12 @@ export default function IssueProgress() {
     }
   };
 
+  // Function to handle saving progress
+  const handleSaveProgress = () => {
+    // In a real app, this would send data to an API
+    alert(`Progress updated to stage ${currentStage} with status: ${status}`);
+  };
+
   // Prepare data for charts
   const statusDistribution = [
     { name: 'Resolved', value: reportedIssues.filter(issue => issue.status === 'Resolved').length },
@@ -109,21 +123,90 @@ export default function IssueProgress() {
     value
   }));
 
+  // Calculate metrics for dashboard
+  const totalIssues = reportedIssues.length;
+  const resolvedIssues = reportedIssues.filter(issue => issue.status === 'Resolved').length;
+  const resolutionRate = totalIssues > 0 ? Math.round((resolvedIssues / totalIssues) * 100) : 0;
+
   return (
-    <div className="min-h-screen bg-gradient-to-r from-green-50 to-green-100 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6">
       <NavBarGov />
       
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
+        {/* Dashboard Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">Issue Progress Dashboard</h1>
+          <p className="text-gray-600 mt-2">Track and manage reported issues from citizens</p>
+        </div>
+
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500"
+          >
+            <div className="flex items-center">
+              <div className="rounded-full bg-blue-100 p-3 mr-4">
+                <span className="text-blue-600 text-xl">📋</span>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-600">Total Issues</h3>
+                <p className="text-2xl font-bold text-gray-800">{totalIssues}</p>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500"
+          >
+            <div className="flex items-center">
+              <div className="rounded-full bg-green-100 p-3 mr-4">
+                <span className="text-green-600 text-xl">✅</span>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-600">Resolved Issues</h3>
+                <p className="text-2xl font-bold text-gray-800">{resolvedIssues}</p>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+            className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500"
+          >
+            <div className="flex items-center">
+              <div className="rounded-full bg-purple-100 p-3 mr-4">
+                <span className="text-purple-600 text-xl">📊</span>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-600">Resolution Rate</h3>
+                <p className="text-2xl font-bold text-gray-800">{resolutionRate}%</p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
         {/* Issue Selection */}
         <div className="bg-white shadow-lg rounded-2xl p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Select Issue to Track</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-gray-800">Select Issue to Track</h2>
+            <span className="text-sm text-gray-500">{reportedIssues.length} issues reported</span>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {reportedIssues.slice(0, 6).map((issue) => (
-              <div
+              <motion.div
                 key={issue.id}
-                className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                whileHover={{ y: -5 }}
+                className={`p-4 border rounded-xl cursor-pointer transition-all ${
                   selectedIssue?.id === issue.id
-                    ? 'border-blue-500 bg-blue-50'
+                    ? 'border-blue-500 bg-blue-50 shadow-md'
                     : 'border-gray-200 hover:border-blue-300'
                 }`}
                 onClick={() => handleIssueSelect(issue)}
@@ -141,40 +224,71 @@ export default function IssueProgress() {
                   </span>
                 </div>
                 <p className="text-sm text-gray-600 mt-2 truncate">{issue.description}</p>
-                <p className="text-xs text-gray-500 mt-2">{issue.date}</p>
-              </div>
+                <div className="flex justify-between items-center mt-3">
+                  <p className="text-xs text-gray-500">{issue.date}</p>
+                  <span className="text-xs px-2 py-1 bg-gray-100 rounded-md">{issue.priority || "Medium"}</span>
+                </div>
+              </motion.div>
             ))}
+          </div>
+          <div className="mt-4 text-center">
+            <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+              View All Issues →
+            </button>
           </div>
         </div>
 
         {selectedIssue ? (
           <>
             {/* Issue Summary Card */}
-            <div className="bg-white shadow-lg rounded-2xl p-6 mb-8">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="bg-white shadow-lg rounded-2xl p-6 mb-8"
+            >
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                    {selectedIssue.sector} - Issue #{selectedIssue.id}
-                  </h2>
+                <div className="flex-1">
+                  <div className="flex items-center mb-2">
+                    <h2 className="text-xl font-semibold text-gray-800 mr-3">
+                      {selectedIssue.sector} - Issue #{selectedIssue.id}
+                    </h2>
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      status === "Resolved" ? "bg-green-100 text-green-800" :
+                      status === "In Progress" ? "bg-blue-100 text-blue-800" :
+                      status === "Could Not Be Fixed" ? "bg-red-100 text-red-800" :
+                      "bg-yellow-100 text-yellow-800"
+                    }`}>
+                      {status}
+                    </span>
+                  </div>
                   <p className="text-gray-600">
                     {selectedIssue.description}
                   </p>
-                  <div className="flex items-center mt-2">
-                    <span className="text-sm font-medium text-gray-700">Reported:</span>
-                    <span className="text-sm text-gray-600 ml-2">{selectedIssue.date}</span>
+                  <div className="flex flex-wrap gap-4 mt-4">
+                    <div className="flex items-center">
+                      <span className="text-sm font-medium text-gray-700">Reported:</span>
+                      <span className="text-sm text-gray-600 ml-2">{selectedIssue.date}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-sm font-medium text-gray-700">Location:</span>
+                      <span className="text-sm text-gray-600 ml-2">{selectedIssue.location || "City Center"}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-sm font-medium text-gray-700">Priority:</span>
+                      <span className="text-sm text-gray-600 ml-2">{selectedIssue.priority || "Medium"}</span>
+                    </div>
                   </div>
                 </div>
-                <div className="mt-4 md:mt-0">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    status === "Resolved" ? "bg-green-100 text-green-800" :
-                    status === "In Progress" ? "bg-blue-100 text-blue-800" :
-                    "bg-yellow-100 text-yellow-800"
-                  }`}>
-                    {status}
-                  </span>
+                <div className="mt-4 md:mt-0 flex space-x-2">
+                  <button className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors">
+                    View Details
+                  </button>
+                  <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                    Share Update
+                  </button>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Progress Timeline */}
@@ -183,21 +297,27 @@ export default function IssueProgress() {
                 
                 <div className="relative">
                   {/* Vertical line */}
-                  <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-green-200"></div>
+                  <div className="absolute left-7 top-2 bottom-2 w-0.5 bg-blue-100"></div>
                   
                   <div className="space-y-8">
                     {progressStages.map((stage, index) => (
-                      <div key={stage.id} className="relative flex items-start">
-                        <div className={`relative z-10 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                          stage.status === "completed" ? "bg-green-500" :
-                          stage.status === "active" ? "bg-blue-500 animate-pulse" : "bg-gray-300"
+                      <motion.div 
+                        key={stage.id} 
+                        className="relative flex items-start"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <div className={`relative z-10 flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
+                          stage.status === "completed" ? "bg-green-500 shadow-md" :
+                          stage.status === "active" ? "bg-blue-500 shadow-md animate-pulse" : "bg-gray-300"
                         }`}>
                           {stage.status === "completed" ? (
-                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                             </svg>
                           ) : (
-                            <span className="text-xs font-bold text-white">{stage.id}</span>
+                            <span className="text-white font-bold">{stage.id}</span>
                           )}
                         </div>
                         
@@ -220,10 +340,13 @@ export default function IssueProgress() {
                               <p className="text-xs text-blue-700 mt-1">
                                 <span className="font-medium">Estimated completion:</span> Tomorrow, 3:00 PM
                               </p>
+                              <p className="text-xs text-blue-700 mt-1">
+                                <span className="font-medium">Supervisor:</span> John Smith (555-1234)
+                              </p>
                             </div>
                           )}
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
                 </div>
@@ -231,14 +354,24 @@ export default function IssueProgress() {
                 {/* Issue resolution failed section */}
                 {status === "Could Not Be Fixed" && (
                   <div className="mt-8 p-4 bg-red-50 rounded-lg border border-red-200">
-                    <h3 className="text-red-800 font-medium">Issue Resolution Failed</h3>
+                    <h3 className="text-red-800 font-medium flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                      Issue Resolution Failed
+                    </h3>
                     <p className="text-sm text-red-700 mt-1">
                       The issue could not be resolved due to adverse weather conditions. 
                       Work will resume when conditions improve.
                     </p>
-                    <button className="mt-3 text-sm text-red-800 font-medium hover:underline">
-                      View detailed report
-                    </button>
+                    <div className="mt-3 flex space-x-2">
+                      <button className="text-sm text-red-800 font-medium hover:underline">
+                        View detailed report
+                      </button>
+                      <button className="text-sm text-red-800 font-medium hover:underline">
+                        Reschedule work
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -254,18 +387,18 @@ export default function IssueProgress() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Current Stage
                     </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {[1, 2, 3, 4, 5].map(stage => (
+                    <div className="grid grid-cols-5 gap-2">
+                      {progressStages.map(stage => (
                         <button
-                          key={stage}
-                          onClick={() => updateStage(stage)}
-                          className={`py-2 px-3 rounded-lg text-sm font-medium ${
-                            currentStage === stage
-                              ? "bg-blue-600 text-white"
+                          key={stage.id}
+                          onClick={() => updateStage(stage.id)}
+                          className={`py-2 px-3 rounded-lg text-sm font-medium flex items-center justify-center ${
+                            currentStage === stage.id
+                              ? "bg-blue-600 text-white shadow-md"
                               : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                           }`}
                         >
-                          Stage {stage}
+                          {stage.id}
                         </button>
                       ))}
                     </div>
@@ -294,12 +427,22 @@ export default function IssueProgress() {
                     <textarea
                       placeholder="Add any additional information about the progress..."
                       className="w-full border border-gray-300 rounded-lg px-4 py-2 h-24 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
                     ></textarea>
                   </div>
 
-                  <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg shadow transition-colors">
-                    Save Progress Update
-                  </button>
+                  <div className="flex space-x-3">
+                    <button 
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg shadow transition-colors font-medium"
+                      onClick={handleSaveProgress}
+                    >
+                      Save Progress Update
+                    </button>
+                    <button className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                      Cancel
+                    </button>
+                  </div>
                 </div>
 
                 {/* Status Distribution Chart */}
@@ -319,10 +462,11 @@ export default function IssueProgress() {
                         label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                       >
                         {statusDistribution.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          <Cell key={`cell-${index}`} fill={STATUS_COLORS[entry.name]} />
                         ))}
                       </Pie>
                       <Tooltip />
+                      <Legend />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
@@ -330,28 +474,39 @@ export default function IssueProgress() {
             </div>
           </>
         ) : (
-          <div className="bg-white shadow-lg rounded-2xl p-8 text-center">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-white shadow-lg rounded-2xl p-8 text-center"
+          >
             <div className="text-gray-400 mb-4 text-6xl">📋</div>
             <h3 className="text-xl font-medium text-gray-700 mb-2">Select an Issue</h3>
             <p className="text-gray-500">Choose an issue from the list above to view and update its progress</p>
-          </div>
+          </motion.div>
         )}
 
         {/* Additional Charts Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
           {/* Progress Chart */}
           <div className="bg-white shadow-lg rounded-2xl p-6">
-            <h2 className="text-lg font-semibold text-gray-700 mb-4">
-              Weekly Resolution Trend
-            </h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-700">
+                Weekly Resolution Trend
+              </h2>
+              <select className="text-sm border border-gray-300 rounded-md px-2 py-1">
+                <option>Last 7 days</option>
+                <option>Last 30 days</option>
+                <option>Last 90 days</option>
+              </select>
+            </div>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={progressData}>
-                <CartesianGrid strokeDasharray="3 3" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
                 <XAxis dataKey="day" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="resolved" fill="#16a34a" name="Resolved" />
-                <Bar dataKey="pending" fill="#ef4444" name="Pending" />
+                <Bar dataKey="resolved" fill="#10B981" name="Resolved" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="pending" fill="#F59E0B" name="Pending" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -367,13 +522,39 @@ export default function IssueProgress() {
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                 layout="vertical"
               >
-                <CartesianGrid strokeDasharray="3 3" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
                 <XAxis type="number" />
                 <YAxis type="category" dataKey="name" width={80} />
                 <Tooltip />
-                <Bar dataKey="value" fill="#2563eb" name="Issues" />
+                <Bar dataKey="value" fill="#4C6FFF" name="Issues" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Recent Activity Section */}
+        <div className="bg-white shadow-lg rounded-2xl p-6 mt-8">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">Recent Activity</h2>
+          <div className="space-y-4">
+            {reportedIssues.slice(0, 3).map((issue, index) => (
+              <div key={index} className="flex items-center p-3 border-b border-gray-100 last:border-0">
+                <div className={`w-3 h-3 rounded-full mr-3 ${
+                  issue.status === "Resolved" ? "bg-green-500" :
+                  issue.status === "In Progress" ? "bg-blue-500" : "bg-yellow-500"
+                }`}></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-800">Issue #{issue.id} - {issue.sector}</p>
+                  <p className="text-xs text-gray-500">Updated {issue.date}</p>
+                </div>
+                <span className={`px-2 py-1 rounded-full text-xs ${
+                  issue.status === "Resolved" ? "bg-green-100 text-green-800" :
+                  issue.status === "In Progress" ? "bg-blue-100 text-blue-800" :
+                  "bg-yellow-100 text-yellow-800"
+                }`}>
+                  {issue.status}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
