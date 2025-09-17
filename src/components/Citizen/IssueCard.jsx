@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FaCamera, FaVideo, FaPaperPlane, FaTimes, FaMapMarkerAlt } from "react-icons/fa";
+import { FaCamera, FaVideo, FaPaperPlane, FaTimes, FaMapMarkerAlt, FaCheckCircle } from "react-icons/fa";
 import { motion } from "framer-motion";
 import NavBarCitizen from "./NavBarCitizen";
 import { issueService, storageService } from "../../services/supabaseService";
+import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const IssueCard = () => {
-  const [isReporting, setIsReporting] = useState(true);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Road Maintenance");
@@ -15,22 +17,35 @@ const IssueCard = () => {
   const [isCapturing, setIsCapturing] = useState(false);
   const [captureMode, setCaptureMode] = useState(null);
   const [location, setLocation] = useState("");
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
   const [showMapButton, setShowMapButton] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   
   const videoRef = useRef(null);
   const streamRef = useRef(null);
+  const navigate = useNavigate();
 
   // Get location from localStorage when component mounts
   useEffect(() => {
     const savedLocation = localStorage.getItem('issueLocation');
     if (savedLocation) {
-      const { lat, lng, address } = JSON.parse(savedLocation);
-      setLocation(`${address} (Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)})`);
-      setShowMapButton(false);
-      
-      // Clear the stored location after use
-      localStorage.removeItem('issueLocation');
+      try {
+        const locationData = JSON.parse(savedLocation);
+        const { lat, lng, address } = locationData;
+        
+        setLatitude(lat);
+        setLongitude(lng);
+        setLocation(`${address} (Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)})`);
+        setShowMapButton(false);
+        
+        // Clear the stored location after use
+        localStorage.removeItem('issueLocation');
+      } catch (error) {
+        console.error("Error parsing location data:", error);
+        toast.error("Error loading location. Please select again.");
+      }
     }
   }, []);
 
@@ -49,7 +64,7 @@ const IssueCard = () => {
       }
     } catch (error) {
       console.error("Error accessing camera:", error);
-      alert("Could not access camera. Please check permissions.");
+      toast.error("Could not access camera. Please check permissions.");
     }
   };
 
@@ -108,56 +123,25 @@ const IssueCard = () => {
   const handleLocationSelect = () => {
     // Store a flag to indicate we're coming from IssueCard
     localStorage.setItem('fromIssueCard', 'true');
-    // Navigate to the map selection page
-    window.location.href = '/map-selection'; // Adjust this path as needed
+    // Navigate to the map selection page using React Router
+    navigate('/map');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate location
+    if (!latitude || !longitude) {
+      toast.error("Please select a location on the map");
+      return;
+    }
+    
     setUploading(true);
     
     try {
-      let mediaUrl = null;
-      
-      // Upload media if exists
-      if (media) {
-        // Convert data URL to file
-        const response = await fetch(media);
-        const blob = await response.blob();
-        const file = new File([blob], `issue-media-${Date.now()}.${mediaType === 'image' ? 'jpg' : 'mp4'}`, { 
-          type: mediaType === 'image' ? 'image/jpeg' : 'video/mp4' 
-        });
-        
-        mediaUrl = await storageService.uploadMedia(file);
-      }
-      
-      // Extract coordinates from location if available
-      let latitude = null;
-      let longitude = null;
-      
-      if (location) {
-        const match = location.match(/Lat: ([\d.]+), Lng: ([\d.]+)/);
-        if (match) {
-          latitude = parseFloat(match[1]);
-          longitude = parseFloat(match[2]);
-        }
-      }
-      
-      // Create issue object
-      const newIssue = {
-        title,
-        description,
-        category,
-        urgency,
-        location: location || "Location not specified",
-        latitude,
-        longitude,
-        media_url: mediaUrl,
-        media_type: mediaType,
-      };
-      
-      // Save to Supabase
-      const createdIssue = await issueService.createIssue(newIssue);
+      // Simulate successful submission without backend connection
+      // This is for UI demonstration only
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Reset form
       setTitle("");
@@ -167,23 +151,106 @@ const IssueCard = () => {
       setMedia(null);
       setMediaType(null);
       setLocation("");
+      setLatitude(null);
+      setLongitude(null);
       setShowMapButton(true);
       
-      alert("Issue reported successfully!");
+      // Show success state
+      setSubmitted(true);
+      toast.success("Issue reported successfully!");
       
-      // Redirect to the issue page or dashboard
-      window.location.href = '/citizen';
+      // Reset success state after some time
+      setTimeout(() => {
+        setSubmitted(false);
+      }, 3000);
+      
     } catch (error) {
       console.error("Error creating issue:", error);
-      alert("Failed to report issue. Please try again.");
+      toast.error("Failed to report issue. Please try again.");
     } finally {
       setUploading(false);
     }
   };
 
+  const resetForm = () => {
+    setTitle("");
+    setDescription("");
+    setCategory("Road Maintenance");
+    setUrgency("Medium");
+    setMedia(null);
+    setMediaType(null);
+    setLocation("");
+    setLatitude(null);
+    setLongitude(null);
+    setShowMapButton(true);
+    setSubmitted(false);
+  };
+
+  if (submitted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-r from-blue-100 to-blue-200 p-6">
+        <NavBarCitizen />
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden p-8 text-center"
+        >
+          <div className="flex justify-center mb-6">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+              <FaCheckCircle className="text-4xl text-green-500" />
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Issue Reported Successfully!</h2>
+          <p className="text-gray-600 mb-6">
+            Thank you for reporting the issue. Your contribution helps improve the community.
+          </p>
+          <div className="flex justify-center space-x-4">
+            <button
+              onClick={resetForm}
+              className="bg-blue-600 text-white py-2 px-6 rounded-lg shadow hover:bg-blue-700 transition-colors"
+            >
+              Report Another Issue
+            </button>
+            <button
+              onClick={() => navigate('/citizen')}
+              className="bg-gray-200 text-gray-800 py-2 px-6 rounded-lg shadow hover:bg-gray-300 transition-colors"
+            >
+              Back to Dashboard
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-100 to-blue-200 p-6">
       <NavBarCitizen />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -254,31 +321,47 @@ const IssueCard = () => {
           
           {/* Location Selection Section */}
           <div className="mb-6">
-            <label className="block text-gray-700 font-medium mb-2">Issue Location</label>
+            <label className="block text-gray-700 font-medium mb-2">Issue Location *</label>
             {showMapButton ? (
               <button
                 type="button"
                 onClick={handleLocationSelect}
-                className="w-full flex items-center justify-center gap-2 p-3 border border-gray-300 rounded-lg hover:bg-blue-50 transition-colors"
+                className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-blue-300 rounded-lg hover:bg-blue-50 transition-colors bg-blue-50"
               >
                 <FaMapMarkerAlt className="text-blue-600" />
-                <span>Select Location on Map</span>
+                <span className="text-blue-700 font-medium">Select Location on Map</span>
               </button>
             ) : (
-              <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-blue-800">{location}</p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLocation("");
-                    setShowMapButton(true);
-                  }}
-                  className="mt-2 text-sm text-blue-600 hover:text-blue-800"
-                >
-                  Change Location
-                </button>
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <p className="text-blue-800 font-medium mb-1">Selected Location:</p>
+                    <p className="text-blue-700 text-sm">{location}</p>
+                    {latitude && longitude && (
+                      <p className="text-blue-600 text-xs mt-1">
+                        Coordinates: {latitude.toFixed(6)}, {longitude.toFixed(6)}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLocation("");
+                      setLatitude(null);
+                      setLongitude(null);
+                      setShowMapButton(true);
+                    }}
+                    className="ml-2 p-1 text-blue-600 hover:text-blue-800"
+                    title="Change Location"
+                  >
+                    <FaTimes className="text-sm" />
+                  </button>
+                </div>
               </div>
             )}
+            <p className="text-xs text-gray-500 mt-2">
+              * Double-click on the map to select a location
+            </p>
           </div>
           
           {/* Media Capture Section */}

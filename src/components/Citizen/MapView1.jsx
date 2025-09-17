@@ -210,6 +210,24 @@ const MapFilters = ({ filters, setFilters, categories }) => {
   );
 };
 
+// Geocoding function to get address from coordinates
+const reverseGeocode = async (lat, lng) => {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
+    );
+    const data = await response.json();
+    
+    if (data && data.display_name) {
+      return data.display_name;
+    }
+    return `Location (${lat.toFixed(6)}, ${lng.toFixed(6)})`;
+  } catch (error) {
+    console.error("Geocoding error:", error);
+    return `Location (${lat.toFixed(6)}, ${lng.toFixed(6)})`;
+  }
+};
+
 // Dummy data
 const issues = [
   {
@@ -305,18 +323,26 @@ export default function MapView() {
   }, [filters]);
 
   // Handle double click to set location and redirect
-  const handleMapDoubleClick = useCallback((e) => {
+  const handleMapDoubleClick = useCallback(async (e) => {
     const { lat, lng } = e.latlng;
+    
+    // Get address using geocoding
+    const address = await reverseGeocode(lat, lng);
     
     // Store the location in localStorage
     localStorage.setItem('issueLocation', JSON.stringify({
       lat,
       lng,
-      address: `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`
+      address: address
     }));
     
-    // Redirect to issue reporting page
-    window.location.href = '/issuecard';
+    // Check if we came from IssueCard
+    const fromIssueCard = localStorage.getItem('fromIssueCard');
+    if (fromIssueCard === 'true') {
+      localStorage.removeItem('fromIssueCard');
+      // Redirect back to issue reporting page
+      window.location.href = '/issuecard';
+    }
   }, []);
 
   return (
@@ -376,6 +402,21 @@ export default function MapView() {
       <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-[1000] bg-blue-100 text-blue-800 px-4 py-2 rounded-md text-sm">
         Double-click on the map to report an issue at that location
       </div>
+
+      {/* Back button for IssueCard users */}
+      {localStorage.getItem('fromIssueCard') === 'true' && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] bg-white px-4 py-2 rounded-md shadow-md">
+          <button
+            onClick={() => {
+              localStorage.removeItem('fromIssueCard');
+              window.location.href = '/issuecard';
+            }}
+            className="text-blue-600 hover:text-blue-800 font-medium"
+          >
+            ← Back to Issue Form
+          </button>
+        </div>
+      )}
     </div>
   );
 }
