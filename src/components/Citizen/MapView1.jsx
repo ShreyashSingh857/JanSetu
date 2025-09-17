@@ -1,8 +1,8 @@
 import { MapContainer, TileLayer, useMap, LayersControl, Marker, Popup, useMapEvents } from "react-leaflet";
-import L from "leaflet";
+import L from 'leaflet';
+import 'leaflet.heat';
 import "leaflet/dist/leaflet.css";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import 'leaflet.heat';
 import NavBarCitizen from "./NavBarCitizen";
 
 // Fix for default markers in react-leaflet

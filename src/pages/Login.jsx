@@ -1,4 +1,4 @@
-// src/pages/Login.jsx - Updated version without Firebase
+// src/pages/Login.jsx - Updated for email verification
 import React, { useState, useEffect } from 'react';
 import { 
   FaUser, 
@@ -6,31 +6,26 @@ import {
   FaArrowLeft,
   FaCheckCircle,
   FaExclamationTriangle,
-  FaPhone,
+  FaEnvelope,
   FaShieldAlt
 } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '../lib/supabase';
 import logo from '../assets/jansetunew.png';
 
 const Login = () => {
   const [activeScreen, setActiveScreen] = useState('type');
   const [loginType, setLoginType] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [otp, setOtp] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({ 
     message: '', 
     visible: false, 
     type: 'success' 
   });
-  const [countdown, setCountdown] = useState(0);
-
-  useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [countdown]);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [fullName, setFullName] = useState('');
 
   const showNotification = (message, type = 'success') => {
     setNotification({ message, visible: true, type });
@@ -41,88 +36,95 @@ const Login = () => {
 
   const handleLoginTypeSelect = (type) => {
     setLoginType(type);
-    setActiveScreen('phone');
+    setActiveScreen('email');
   };
 
-  const handlePhoneSubmit = async (e) => {
+  const handleEmailSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     
-    // Validate phone number
-    if (!phoneNumber || phoneNumber.replace(/\D/g, '').length !== 10) {
-      showNotification('Please enter a valid 10-digit phone number', 'error');
+    // Validate email
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+      showNotification('Please enter a valid email address', 'error');
       setLoading(false);
       return;
     }
     
     try {
-      // Simulate OTP sending
-      setTimeout(() => {
-        setActiveScreen('otp');
-        setCountdown(30); // 30-second countdown for resend
-        showNotification(`Verification code sent to your phone for ${loginType} login!`);
-        setLoading(false);
-      }, 1000);
-    } catch (error) {
-      console.error('Error sending OTP:', error);
-      showNotification('Failed to send OTP. Please try again.', 'error');
-      setLoading(false);
-    }
-  };
+      if (isSignUp) {
+        // Sign up with email and password
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              user_type: loginType,
+              full_name: fullName
+            }
+          }
+        });
 
-  const handleOtpSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Validate OTP
-    if (!otp || otp.length !== 4) {
-      showNotification('Please enter a valid 4-digit OTP', 'error');
-      return;
-    }
-    
-    setLoading(true);
-    
-    try {
-      // Check if OTP matches the fixed value (2227)
-      if (otp === '2227') {
-        // Simulate successful login
-        setTimeout(() => {
+        if (error) throw error;
+        
+        showNotification('Account created successfully! Please check your email for verification.');
+        setIsSignUp(false);
+        setPassword('');
+        setFullName('');
+      } else {
+        // Sign in with email and password
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) throw error;
+
+        if (data.user) {
+          // Check if user exists in our users table, if not create them
+          const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', data.user.id)
+            .single();
+
+          if (userError && userError.code === 'PGRST116') {
+            // User doesn't exist, create new user
+            const userMetadata = data.user.user_metadata;
+            const { error: insertError } = await supabase
+              .from('users')
+              .insert([
+                {
+                  id: data.user.id,
+                  email: email,
+                  user_type: userMetadata.user_type || loginType,
+                  full_name: userMetadata.full_name || `${loginType.charAt(0).toUpperCase() + loginType.slice(1)} User`,
+                  created_at: new Date().toISOString()
+                }
+              ]);
+
+            if (insertError) {
+              console.error('Error creating user:', insertError);
+            }
+          }
+
           showNotification('Login successful! Redirecting...');
           
-          // Store login info in localStorage
+          // Store user info in localStorage
           localStorage.setItem('isLoggedIn', 'true');
           localStorage.setItem('userType', loginType);
-          localStorage.setItem('phoneNumber', phoneNumber);
+          localStorage.setItem('email', email);
+          localStorage.setItem('userId', data.user.id);
           
           // Redirect based on user type
           setTimeout(() => {
             window.location.href = loginType === 'citizen' ? '/citizen' : '/government';
           }, 1500);
-        }, 1000);
-      } else {
-        showNotification('Invalid OTP. Please try again.', 'error');
-        setLoading(false);
+        }
       }
     } catch (error) {
-      console.error('Error verifying OTP:', error);
-      showNotification('Invalid OTP. Please try again.', 'error');
-      setLoading(false);
-    }
-  };
-
-  const handleResendOtp = async () => {
-    if (countdown > 0) return;
-    
-    setLoading(true);
-    try {
-      // Simulate OTP resending
-      setTimeout(() => {
-        setCountdown(30);
-        showNotification('New verification code sent!');
-        setLoading(false);
-      }, 1000);
-    } catch (error) {
-      console.error('Error resending OTP:', error);
-      showNotification('Failed to resend OTP. Please try again.', 'error');
+      console.error('Authentication error:', error);
+      showNotification(error.message, 'error');
+    } finally {
       setLoading(false);
     }
   };
@@ -132,8 +134,10 @@ const Login = () => {
     setActiveScreen('type');
   };
 
-  const handleBackToPhone = () => {
-    setActiveScreen('phone');
+  const toggleSignUpMode = () => {
+    setIsSignUp(!isSignUp);
+    setPassword('');
+    setFullName('');
   };
 
   return (
@@ -250,10 +254,10 @@ const Login = () => {
                 </motion.div>
               )}
               
-              {/* Phone Login Screen */}
-              {activeScreen === 'phone' && (
+              {/* Email Login Screen */}
+              {activeScreen === 'email' && (
                 <motion.div
-                  key="phone-screen"
+                  key="email-screen"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
@@ -275,7 +279,7 @@ const Login = () => {
                       )}
                     </div>
                     <h2 className="text-2xl font-bold text-gray-800">
-                      {loginType === 'citizen' ? 'Citizen' : 'Government'} Login
+                      {loginType === 'citizen' ? 'Citizen' : 'Government'} {isSignUp ? 'Sign Up' : 'Login'}
                     </h2>
                   </div>
                   
@@ -286,100 +290,69 @@ const Login = () => {
                     }
                   </p>
                   
-                  <form onSubmit={handlePhoneSubmit}>
-                    <div className="mb-5">
-                      <label className="block text-gray-700 font-medium mb-2" htmlFor="phone">
-                        Phone Number *
+                  <form onSubmit={handleEmailSubmit}>
+                    {isSignUp && (
+                      <div className="mb-4">
+                        <label className="block text-gray-700 font-medium mb-2" htmlFor="fullName">
+                          Full Name *
+                        </label>
+                        <div className="flex border-2 border-gray-300 rounded-lg overflow-hidden bg-white focus-within:border-blue-500 transition-colors">
+                          <div className="flex-1 flex items-center">
+                            <input
+                              type="text"
+                              id="fullName"
+                              value={fullName}
+                              onChange={(e) => setFullName(e.target.value)}
+                              className="flex-1 px-4 py-3 outline-none bg-white"
+                              placeholder="Enter your full name"
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="mb-4">
+                      <label className="block text-gray-700 font-medium mb-2" htmlFor="email">
+                        Email Address *
                       </label>
                       <div className="flex border-2 border-gray-300 rounded-lg overflow-hidden bg-white focus-within:border-blue-500 transition-colors">
-                        <div className="px-4 py-3 bg-gray-100 border-r-2 border-gray-300 font-medium flex items-center">
-                          +91
-                        </div>
                         <div className="flex-1 flex items-center">
-                          <FaPhone className="text-gray-400 ml-4" />
+                          <FaEnvelope className="text-gray-400 ml-4" />
                           <input
-                            type="tel"
-                            id="phone"
-                            value={phoneNumber}
-                            onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                            type="email"
+                            id="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             className="flex-1 px-4 py-3 outline-none bg-white"
-                            placeholder="Enter your phone number"
+                            placeholder="Enter your email address"
                             required
-                            maxLength="10"
-                            pattern="[0-9]{10}"
                           />
                         </div>
                       </div>
-                      <p className="text-sm text-gray-500 mt-1">Enter your 10-digit mobile number</p>
                     </div>
                     
-                    <motion.button 
-                      type="submit"
-                      disabled={loading}
-                      whileHover={{ scale: loading ? 1 : 1.02 }}
-                      whileTap={{ scale: loading ? 1 : 0.98 }}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {loading ? (
-                        <>
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                          Sending OTP...
-                        </>
-                      ) : (
-                        'Send Verification Code'
-                      )}
-                    </motion.button>
-                  </form>
-                  
-                  <div className="mt-8 text-center text-sm text-gray-500">
-                    By continuing, you agree to our <a href="#" className="text-blue-600 hover:underline">Terms of Service</a> and{' '}
-                    <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>.
-                  </div>
-                </motion.div>
-              )}
-              
-              {/* OTP Verification Screen */}
-              {activeScreen === 'otp' && (
-                <motion.div
-                  key="otp-screen"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="w-full max-w-md mx-auto"
-                >
-                  <button 
-                    className="flex items-center text-blue-600 font-medium mb-6 hover:text-blue-800 transition-colors"
-                    onClick={handleBackToPhone}
-                  >
-                    <FaArrowLeft className="mr-2" /> Back to Phone Number
-                  </button>
-                  
-                  <div className="text-center mb-6">
-                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <FaShieldAlt className="text-blue-600 text-2xl" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">Enter Verification Code</h2>
-                    <p className="text-gray-600">
-                      We've sent a 4-digit code to <span className="font-medium">+91 {phoneNumber}</span>
-                    </p>
-                  </div>
-                  
-                  <form onSubmit={handleOtpSubmit}>
-                    <div className="mb-5">
-                      <label className="block text-gray-700 font-medium mb-2" htmlFor="otp">
-                        Verification Code *
+                    <div className="mb-6">
+                      <label className="block text-gray-700 font-medium mb-2" htmlFor="password">
+                        Password *
                       </label>
-                      <input
-                        type="text"
-                        id="otp"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg outline-none bg-white focus:border-blue-500 text-center text-xl font-semibold tracking-widest"
-                        placeholder="Enter 4-digit code"
-                        required
-                        maxLength="4"
-                        pattern="[0-9]{4}"
-                      />
+                      <div className="flex border-2 border-gray-300 rounded-lg overflow-hidden bg-white focus-within:border-blue-500 transition-colors">
+                        <div className="flex-1 flex items-center">
+                          <input
+                            type="password"
+                            id="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="flex-1 px-4 py-3 outline-none bg-white"
+                            placeholder="Enter your password"
+                            required
+                            minLength="6"
+                          />
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {isSignUp ? 'Password must be at least 6 characters long' : 'Enter your password'}
+                      </p>
                     </div>
                     
                     <motion.button 
@@ -392,24 +365,31 @@ const Login = () => {
                       {loading ? (
                         <>
                           <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                          Verifying...
+                          {isSignUp ? 'Creating Account...' : 'Logging in...'}
                         </>
                       ) : (
-                        'Verify Code'
+                        isSignUp ? 'Create Account' : 'Login'
                       )}
                     </motion.button>
                     
                     <div className="text-center">
                       <button 
                         type="button"
-                        onClick={handleResendOtp}
-                        disabled={countdown > 0 || loading}
-                        className="text-blue-600 hover:text-blue-800 disabled:text-gray-400 disabled:cursor-not-allowed"
+                        onClick={toggleSignUpMode}
+                        className="text-blue-600 hover:text-blue-800"
                       >
-                        {countdown > 0 ? `Resend code in ${countdown}s` : 'Resend Code'}
+                        {isSignUp 
+                          ? 'Already have an account? Login here' 
+                          : "Don't have an account? Sign up here"
+                        }
                       </button>
                     </div>
                   </form>
+                  
+                  <div className="mt-8 text-center text-sm text-gray-500">
+                    By continuing, you agree to our <a href="#" className="text-blue-600 hover:underline">Terms of Service</a> and{' '}
+                    <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>.
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>

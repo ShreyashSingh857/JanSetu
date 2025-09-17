@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { FaCamera, FaVideo, FaPaperPlane, FaTimes, FaMapMarkerAlt } from "react-icons/fa";
 import { motion } from "framer-motion";
 import NavBarCitizen from "./NavBarCitizen";
+import { issueService, storageService } from "../../services/supabaseService";
 
 const IssueCard = () => {
   const [isReporting, setIsReporting] = useState(true);
@@ -15,6 +16,7 @@ const IssueCard = () => {
   const [captureMode, setCaptureMode] = useState(null);
   const [location, setLocation] = useState("");
   const [showMapButton, setShowMapButton] = useState(true);
+  const [uploading, setUploading] = useState(false);
   
   const videoRef = useRef(null);
   const streamRef = useRef(null);
@@ -110,41 +112,73 @@ const IssueCard = () => {
     window.location.href = '/map-selection'; // Adjust this path as needed
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setUploading(true);
     
-    // Create issue object
-    const newIssue = {
-      id: Date.now(),
-      title,
-      description,
-      category,
-      urgency,
-      media: media || null,
-      mediaType,
-      status: "Reported",
-      date: new Date().toISOString().split('T')[0],
-      location: location || "Location not specified",
-      upvotes: 0,
-      comments: 0
-    };
-    
-    // Save to localStorage
-    const existingIssues = JSON.parse(localStorage.getItem('reportedIssues') || '[]');
-    existingIssues.push(newIssue);
-    localStorage.setItem('reportedIssues', JSON.stringify(existingIssues));
-    
-    // Reset form
-    setTitle("");
-    setDescription("");
-    setCategory("Road Maintenance");
-    setUrgency("Medium");
-    setMedia(null);
-    setMediaType(null);
-    setLocation("");
-    setShowMapButton(true);
-    
-    alert("Issue reported successfully!");
+    try {
+      let mediaUrl = null;
+      
+      // Upload media if exists
+      if (media) {
+        // Convert data URL to file
+        const response = await fetch(media);
+        const blob = await response.blob();
+        const file = new File([blob], `issue-media-${Date.now()}.${mediaType === 'image' ? 'jpg' : 'mp4'}`, { 
+          type: mediaType === 'image' ? 'image/jpeg' : 'video/mp4' 
+        });
+        
+        mediaUrl = await storageService.uploadMedia(file);
+      }
+      
+      // Extract coordinates from location if available
+      let latitude = null;
+      let longitude = null;
+      
+      if (location) {
+        const match = location.match(/Lat: ([\d.]+), Lng: ([\d.]+)/);
+        if (match) {
+          latitude = parseFloat(match[1]);
+          longitude = parseFloat(match[2]);
+        }
+      }
+      
+      // Create issue object
+      const newIssue = {
+        title,
+        description,
+        category,
+        urgency,
+        location: location || "Location not specified",
+        latitude,
+        longitude,
+        media_url: mediaUrl,
+        media_type: mediaType,
+      };
+      
+      // Save to Supabase
+      const createdIssue = await issueService.createIssue(newIssue);
+      
+      // Reset form
+      setTitle("");
+      setDescription("");
+      setCategory("Road Maintenance");
+      setUrgency("Medium");
+      setMedia(null);
+      setMediaType(null);
+      setLocation("");
+      setShowMapButton(true);
+      
+      alert("Issue reported successfully!");
+      
+      // Redirect to the issue page or dashboard
+      window.location.href = '/citizen';
+    } catch (error) {
+      console.error("Error creating issue:", error);
+      alert("Failed to report issue. Please try again.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -342,10 +376,20 @@ const IssueCard = () => {
           
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg shadow hover:bg-blue-700 transition-colors"
+            disabled={uploading}
+            className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg shadow hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <FaPaperPlane />
-            <span>Report Issue</span>
+            {uploading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <span>Reporting Issue...</span>
+              </>
+            ) : (
+              <>
+                <FaPaperPlane />
+                <span>Report Issue</span>
+              </>
+            )}
           </button>
         </form>
       </motion.div>
