@@ -1,139 +1,124 @@
-// src/context/AuthContext.jsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { auth } from '../config/firebase';
-import { onAuthStateChanged, RecaptchaVerifier, signInWithPhoneNumber, signOut } from 'firebase/auth';
+// Supabase Auth Context (replaces Firebase version)
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { supabase } from '../lib/supabase';
 
-const AuthContext = createContext();
+const AuthContext = createContext(undefined);
 
 export function useAuth() {
   return useContext(AuthContext);
 }
 
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null);
+  const [session, setSession] = useState(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [confirmationResult, setConfirmationResult] = useState(null);
+  const [initializing, setInitializing] = useState(true);
 
-  // Set up reCAPTCHA verifier
-  const setUpRecaptcha = (phoneNumber) => {
-    // Clear any existing recaptcha container
-    const existingContainer = document.getElementById('recaptcha-container');
-    if (existingContainer) {
-      existingContainer.innerHTML = '';
+  const syncLocal = useCallback((s) => {
+    if (!s) {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userType');
+      localStorage.removeItem('email');
+      localStorage.removeItem('userId');
+      return;
     }
-    
-    const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-      'size': 'invisible',
-      'callback': (response) => {
-        console.log('Recaptcha verified');
-      },
-      'expired-callback': () => {
-        console.log('Recaptcha expired');
-      }
-    });
-
-    return recaptchaVerifier;
-  };
-
-  // Sign in with phone number
-  const signInWithPhone = async (phoneNumber) => {
-    try {
-      const recaptchaVerifier = setUpRecaptcha(phoneNumber);
-      const confirmation = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
-      setConfirmationResult(confirmation);
-      return confirmation;
-    } catch (error) {
-      console.error('Error sending OTP:', error);
-      
-      // Clear recaptcha on error
-      const recaptchaContainer = document.getElementById('recaptcha-container');
-      if (recaptchaContainer) {
-        recaptchaContainer.innerHTML = '';
-      }
-      
-      throw error;
-    }
-  };
-
-  // Verify OTP
-  const verifyOtp = async (code) => {
-    try {
-      if (!confirmationResult) {
-        throw new Error('No confirmation result available. Please request a new OTP.');
-      }
-      
-      const result = await confirmationResult.confirm(code);
-      setCurrentUser(result.user);
-      return result;
-    } catch (error) {
-      console.error('Error verifying OTP:', error);
-      
-      // Handle specific error cases
-      if (error.code === 'auth/invalid-verification-code') {
-        throw new Error('Invalid verification code. Please try again.');
-      } else if (error.code === 'auth/code-expired') {
-        throw new Error('Verification code has expired. Please request a new one.');
-      } else {
-        throw error;
+    const u = s.user;
+    localStorage.setItem('isLoggedIn', 'true');
+    if (u) {
+      localStorage.setItem('userId', u.id);
+      localStorage.setItem('email', u.email || '');
+      if (u.user_metadata?.user_type) {
+        localStorage.setItem('userType', u.user_metadata.user_type);
       }
     }
-  };
-
-  // Sign out
-  const logout = () => {
-    // Clear recaptcha on logout
-    const recaptchaContainer = document.getElementById('recaptcha-container');
-    if (recaptchaContainer) {
-      recaptchaContainer.innerHTML = '';
-    }
-    
-    setConfirmationResult(null);
-    return signOut(auth);
-  };
-
-  // Clear recaptcha when component unmounts
-  useEffect(() => {
-    return () => {
-      const recaptchaContainer = document.getElementById('recaptcha-container');
-      if (recaptchaContainer) {
-        recaptchaContainer.innerHTML = '';
-      }
-    };
   }, []);
 
-  // Auth state listener
+  // Initial load
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
+    let mounted = true;
+    (async () => {
+      const { data: { session: current } } = await supabase.auth.getSession();
+      if (!mounted) return;
+      setSession(current);
+      setUser(current?.user || null);
+      syncLocal(current);
+      setInitializing(false);
       setLoading(false);
-      
-      if (user) {
-        console.log('User logged in:', user.uid);
-      } else {
-        console.log('User logged out');
-        // Clear recaptcha when user logs out
-        const recaptchaContainer = document.getElementById('recaptcha-container');
-        if (recaptchaContainer) {
-          recaptchaContainer.innerHTML = '';
-        }
-      }
-    });
+    })();
+    return () => { mounted = false; };
+  }, [syncLocal]);
 
-    return unsubscribe;
-  }, []);
+  // Listen for auth changes
+  useEffect(() => {
+    const { data: listener } = supabase.auth.onAuthStateChange(async (event, sess) => {
+      setSession(sess);
+      setUser(sess?.user || null);
+      syncLocal(sess);
+      setLoading(false);
+    });
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, [syncLocal]);
+
+  // Helpers
+  const signInWithPassword = async (email, password) => {
+    setLoading(true);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) throw error;
+    return data;
+  };
+
+  const signUp = async ({ email, password, user_type, full_name }) => {
+    setLoading(true);
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { user_type, full_name } }
+    });
+    setLoading(false);
+    if (error) throw error;
+    return data;
+  };
+
+  const signInWithGoogle = async (user_type) => {
+    if (user_type) localStorage.setItem('pendingUserType', user_type);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/auth/callback` }
+    });
+    if (error) throw error;
+  };
+
+  const signOutUser = async () => {
+    await supabase.auth.signOut();
+  };
+
+  const refreshUser = async () => {
+    const { data: { user: refreshed } } = await supabase.auth.getUser();
+    setUser(refreshed || null);
+    if (refreshed?.user_metadata?.user_type) {
+      localStorage.setItem('userType', refreshed.user_metadata.user_type);
+    }
+    return refreshed;
+  };
 
   const value = {
-    currentUser,
-    signInWithPhone,
-    verifyOtp,
-    logout,
-    confirmationResult,
-    loading
+    session,
+    user,
+    loading,
+    initializing,
+    signInWithPassword,
+    signUp,
+    signInWithGoogle,
+    signOut: signOutUser,
+    refreshUser
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {!initializing && children}
     </AuthContext.Provider>
   );
 }

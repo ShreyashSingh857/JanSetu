@@ -1,0 +1,257 @@
+id,text,urgency,category,source
+r001,Street light flickering outside community hall,normal,electricity,real
+r002,Open garbage heap attracting stray animals near school gate,urgent,sanitation,real
+r003,Water supply low pressure since last night in sector 9,normal,water,real
+r004,Broken footpath tiles injuring pedestrians at main square,urgent,road,real
+r005,Mosquito breeding due to stagnant water behind hospital,urgent,health,real
+b3d6197bc0,No water supply in houses near Stadium Entrance since morning,normal,water,synthetic
+b33dbe104a,Large pothole near Temple Street causing accidents,urgent,road,synthetic
+57ce0d6443,Unauthorized street vendor congestion at Old Market,normal,other,synthetic
+269054b15a,No water supply in houses near Main Square since morning,normal,water,synthetic
+cc1d39453a,Broken public bench near Sector 9,urgent,other,synthetic
+8b598e4742,Illegal parking blocking access near Temple Street,urgent,other,synthetic
+f1928c5108,Overflowing dustbin causing smell at Railway Crossing,urgent,sanitation,synthetic
+7af57386c4,Frequent power cuts happening near Railway Crossing,normal,electricity,synthetic
+37c4abc3c4,Transformer making loud noise near Main Square,urgent,electricity,synthetic
+b97665143c,Noise complaint due to loud speakers at Community Hall,urgent,other,synthetic
+5d85f632da,Electric pole wires hanging dangerously at Library Circle,urgent,electricity,synthetic
+be89d4e491,Road surface broken and creating traffic jam at Ward 14,normal,road,synthetic
+aace93ad88,Mosquito breeding due to stagnant water at Central Park,urgent,health,synthetic
+b300806cf2,Frequent power cuts happening near Ward 14,urgent,electricity,synthetic
+277b43d361,No water supply in houses near Library Circle since morning,normal,water,synthetic
+cf70d6d8cf,Unhygienic conditions around public clinic at Stadium Entrance,urgent,health,synthetic
+43f896a211,Dog bite incident reported at Community Hall,urgent,health,synthetic
+3004f9218f,Overflowing dustbin causing smell at Hospital Road,urgent,sanitation,synthetic
+4b1b0e1430,Unhygienic conditions around public clinic at River Bridge,normal,health,synthetic
+e6343141b4,Mosquito breeding due to stagnant water at Temple Street,urgent,health,synthetic
+e8785295b1,Voltage fluctuation damaging appliances around Bus Stand,normal,electricity,synthetic
+3ff747227d,Noise complaint due to loud speakers at Railway Crossing,urgent,other,synthetic
+4ff020189a,Construction debris blocking part of the road at Old Market,normal,road,synthetic
+4c194275c2,Dog bite incident reported at Central Park,urgent,health,synthetic
+4a29e2a5a2,Faded lane markings on busy junction at Sector 9,normal,road,synthetic
+07964a23e9,Unauthorized street vendor congestion at Ward 14,urgent,other,synthetic
+c714e68eea,Transformer making loud noise near Ward 14,normal,electricity,synthetic
+9ee6bfe6f8,Frequent power cuts happening near Library Circle,normal,electricity,synthetic
+aebc25b696,Transformer making loud noise near Library Circle,normal,electricity,synthetic
+66bf0f3889,Transformer making loud noise near Temple Street,normal,electricity,synthetic
+316b623b5d,Construction debris blocking part of the road at River Bridge,normal,road,synthetic
+5dc3293a7f,Electric pole wires hanging dangerously at Temple Street,urgent,electricity,synthetic
+79c08fec77,Large pothole near Ward 14 causing accidents,urgent,road,synthetic
+346fab2693,Broken public bench near Library Circle,normal,other,synthetic
+bdf03467ad,Vandalized signboard at Old Market,normal,other,synthetic
+facbcf9a59,Open waste dumping spotted behind Sector 9,normal,sanitation,synthetic
+bea144a0a5,Blocked drain causing stagnant water at Central Park,urgent,sanitation,synthetic
+65fc0f5a10,Construction debris blocking part of the road at Temple Street,urgent,road,synthetic
+3ecffa13ac,Noise complaint due to loud speakers at Library Circle,urgent,other,synthetic
+323094039c,Transformer making loud noise near School Gate,normal,electricity,synthetic
+5932b39dca,Damaged speed breaker making vehicles jump at Ward 14,normal,road,synthetic
+34abcd6891,No water supply in houses near Hospital Road since morning,urgent,water,synthetic
+8f53b4374e,Unhygienic conditions around public clinic at Sector 9,normal,health,synthetic
+a79d2d4b68,Road surface broken and creating traffic jam at Stadium Entrance,urgent,road,synthetic
+c4ee19f7fd,Contaminated muddy water coming from tap at Temple Street,urgent,water,synthetic
+2b2123d070,Frequent power cuts happening near School Gate,normal,electricity,synthetic
+5b65285273,Contaminated muddy water coming from tap at Green Avenue,urgent,water,synthetic
+d4d6ef4bf9,Garbage pile not collected for days near School Gate,normal,sanitation,synthetic
+de4b94dfa6,Road surface broken and creating traffic jam at Railway Crossing,normal,road,synthetic
+41c8f9ddec,Garbage pile not collected for days near Green Avenue,urgent,sanitation,synthetic
+7d772f783c,Blocked drain causing stagnant water at Railway Crossing,urgent,sanitation,synthetic
+f25a00c80b,Unauthorized street vendor congestion at Library Circle,normal,other,synthetic
+4232d0a966,Blocked drain causing stagnant water at Ward 14,urgent,sanitation,synthetic
+e90c039294,Damaged speed breaker making vehicles jump at River Bridge,normal,road,synthetic
+241766c60c,Blocked drain causing stagnant water at Hospital Road,urgent,sanitation,synthetic
+db8e138d39,Electric pole wires hanging dangerously at Sector 9,urgent,electricity,synthetic
+2794ad3680,Water leakage from main pipeline at Temple Street,urgent,water,synthetic
+dbaf97bff0,Litter scattered around market area near Temple Street,urgent,sanitation,synthetic
+5e2e0428bc,Large pothole near Central Park causing accidents,urgent,road,synthetic
+ece667b06d,Voltage fluctuation damaging appliances around Community Hall,urgent,electricity,synthetic
+6e27d09169,Open sewage causing foul smell near Central Park,urgent,health,synthetic
+39b2662529,Street light not working at Ward 14,normal,electricity,synthetic
+02dab0eeed,Dog bite incident reported at School Gate,urgent,health,synthetic
+71ce9c8095,Dog bite incident reported at Green Avenue,urgent,health,synthetic
+1af30fbd0c,Frequent power cuts happening near Old Market,urgent,electricity,synthetic
+66f8327647,Broken public bench near Central Park,normal,other,synthetic
+d60de7af5c,Medical waste dumped openly behind Community Hall,normal,health,synthetic
+760a84b0ef,Vandalized signboard at Stadium Entrance,urgent,other,synthetic
+1646af104c,Dog bite incident reported at Stadium Entrance,urgent,health,synthetic
+489de7b5f2,Low pressure water supply reported around Stadium Entrance,normal,water,synthetic
+5d34c0ec92,Unauthorized street vendor congestion at Community Hall,normal,other,synthetic
+f1666b8752,Dog bite incident reported at River Bridge,urgent,health,synthetic
+5b94656075,Large pothole near Stadium Entrance causing accidents,urgent,road,synthetic
+8be3c16dab,Mosquito breeding due to stagnant water at Sector 9,urgent,health,synthetic
+d15a186c0c,Water leakage from main pipeline at Bus Stand,urgent,water,synthetic
+27caff5c76,Overflowing dustbin causing smell at Community Hall,urgent,sanitation,synthetic
+e0d7abcc44,Garbage pile not collected for days near Sector 9,normal,sanitation,synthetic
+827584fc90,Construction debris blocking part of the road at Hospital Road,normal,road,synthetic
+8ca3370d1c,Medical waste dumped openly behind Hospital Road,normal,health,synthetic
+5540addb03,Voltage fluctuation damaging appliances around Library Circle,normal,electricity,synthetic
+e8982c702e,Unhygienic conditions around public clinic at Main Square,normal,health,synthetic
+e000db90e0,Construction debris blocking part of the road at Main Square,urgent,road,synthetic
+a256ac8a95,Mosquito breeding due to stagnant water at Old Market,urgent,health,synthetic
+904bf4951f,Dog bite incident reported at Hospital Road,urgent,health,synthetic
+bb5a42fdda,Overflowing dustbin causing smell at Stadium Entrance,urgent,sanitation,synthetic
+8f28a88add,Vandalized signboard at Community Hall,urgent,other,synthetic
+ff553d96c5,Unauthorized street vendor congestion at Main Square,normal,other,synthetic
+c178e50269,Litter scattered around market area near Railway Crossing,urgent,sanitation,synthetic
+f0bcbb8168,Illegal parking blocking access near Green Avenue,normal,other,synthetic
+9dd369e416,Open waste dumping spotted behind Library Circle,normal,sanitation,synthetic
+7e6fec0b10,Voltage fluctuation damaging appliances around Old Market,normal,electricity,synthetic
+c01a90c4c0,Frequent power cuts happening near Main Square,urgent,electricity,synthetic
+7dcf845a71,Noise complaint due to loud speakers at Sector 9,urgent,other,synthetic
+18ceb62203,Mosquito breeding due to stagnant water at Ward 14,urgent,health,synthetic
+680261a43d,Road surface broken and creating traffic jam at Hospital Road,normal,road,synthetic
+c3c795b156,Water leakage from main pipeline at Library Circle,urgent,water,synthetic
+728c834733,Illegal parking blocking access near Ward 14,urgent,other,synthetic
+03009bd44e,Large pothole near Main Square causing accidents,urgent,road,synthetic
+ab993d90b6,Transformer making loud noise near Community Hall,normal,electricity,synthetic
+a5d6eb5415,Mosquito breeding due to stagnant water at Library Circle,urgent,health,synthetic
+75047ca31a,Street light not working at Community Hall,normal,electricity,synthetic
+ac174faa89,Water leakage from main pipeline at Sector 9,urgent,water,synthetic
+d9701057d0,Faded lane markings on busy junction at Railway Crossing,normal,road,synthetic
+8c56905373,Dog bite incident reported at Library Circle,urgent,health,synthetic
+5842791a64,Water leakage from main pipeline at Stadium Entrance,urgent,water,synthetic
+d53c3f0748,No water supply in houses near River Bridge since morning,urgent,water,synthetic
+c5fd4bbcd6,Low pressure water supply reported around Bus Stand,normal,water,synthetic
+91492e3b45,Dog bite incident reported at Bus Stand,urgent,health,synthetic
+9f38c99a13,Contaminated muddy water coming from tap at Railway Crossing,urgent,water,synthetic
+dd1fde825a,Medical waste dumped openly behind Ward 14,urgent,health,synthetic
+592711d3b1,Blocked drain causing stagnant water at Sector 9,urgent,sanitation,synthetic
+ce79839540,Garbage pile not collected for days near Main Square,normal,sanitation,synthetic
+dced5f6bff,Mosquito breeding due to stagnant water at Stadium Entrance,urgent,health,synthetic
+c86f33762c,Unhygienic conditions around public clinic at Railway Crossing,urgent,health,synthetic
+444c22a81b,Contaminated muddy water coming from tap at Ward 14,urgent,water,synthetic
+aaa9d4774a,Litter scattered around market area near Community Hall,normal,sanitation,synthetic
+c04e2284c9,Faded lane markings on busy junction at Temple Street,normal,road,synthetic
+6ed5eab989,Road surface broken and creating traffic jam at Bus Stand,normal,road,synthetic
+213acf654a,Blocked drain causing stagnant water at Main Square,urgent,sanitation,synthetic
+c97c3c6e9c,Open sewage causing foul smell near River Bridge,urgent,health,synthetic
+90fd079146,Mosquito breeding due to stagnant water at School Gate,urgent,health,synthetic
+704c6acc97,Litter scattered around market area near Green Avenue,urgent,sanitation,synthetic
+02c1a2cdcb,Contaminated muddy water coming from tap at Main Square,urgent,water,synthetic
+bbf506f99d,Litter scattered around market area near Central Park,urgent,sanitation,synthetic
+a9301d9c4c,Water leakage from main pipeline at Green Avenue,urgent,water,synthetic
+39708d7ec3,Faded lane markings on busy junction at River Bridge,normal,road,synthetic
+99d9ff200e,Mosquito breeding due to stagnant water at Railway Crossing,urgent,health,synthetic
+825a4a77e0,Electric pole wires hanging dangerously at Ward 14,urgent,electricity,synthetic
+454e19e47c,Damaged speed breaker making vehicles jump at Sector 9,urgent,road,synthetic
+bf58da7ab5,Street light not working at Library Circle,normal,electricity,synthetic
+521203207c,Street light not working at Green Avenue,normal,electricity,synthetic
+9d3f1c5899,Damaged speed breaker making vehicles jump at Central Park,normal,road,synthetic
+4e285df023,Low pressure water supply reported around Temple Street,normal,water,synthetic
+fad4a5a632,Overflowing dustbin causing smell at Old Market,urgent,sanitation,synthetic
+94ec8e0585,Large pothole near Railway Crossing causing accidents,urgent,road,synthetic
+d06f01d412,Blocked drain causing stagnant water at Bus Stand,urgent,sanitation,synthetic
+b7dc28a6ac,Broken public bench near School Gate,normal,other,synthetic
+c8a1865ee3,Faded lane markings on busy junction at Stadium Entrance,normal,road,synthetic
+062a136848,Broken public tap wasting water at Old Market,normal,water,synthetic
+6b2f332002,Voltage fluctuation damaging appliances around River Bridge,normal,electricity,synthetic
+bd5ae43347,Broken public bench near Hospital Road,urgent,other,synthetic
+990363d857,Frequent power cuts happening near River Bridge,normal,electricity,synthetic
+cfd6402db5,Broken public bench near Ward 14,normal,other,synthetic
+4ac19aec01,Electric pole wires hanging dangerously at Green Avenue,urgent,electricity,synthetic
+fa18725758,Frequent power cuts happening near Temple Street,normal,electricity,synthetic
+5ef7a34ff7,Low pressure water supply reported around Old Market,normal,water,synthetic
+60b6f99818,Low pressure water supply reported around Main Square,normal,water,synthetic
+030af3b803,Garbage pile not collected for days near Railway Crossing,urgent,sanitation,synthetic
+582e2d798b,Broken public bench near Green Avenue,normal,other,synthetic
+47eb01d2d6,Construction debris blocking part of the road at Community Hall,urgent,road,synthetic
+767cf0b4fc,Faded lane markings on busy junction at Old Market,urgent,road,synthetic
+5b2215b164,Vandalized signboard at Central Park,normal,other,synthetic
+99752fb7f2,Low pressure water supply reported around Railway Crossing,normal,water,synthetic
+74e1d6005d,Contaminated muddy water coming from tap at Hospital Road,urgent,water,synthetic
+631807a7c0,Blocked drain causing stagnant water at Community Hall,urgent,sanitation,synthetic
+8f5ca62a7b,Faded lane markings on busy junction at Bus Stand,normal,road,synthetic
+0e525ac7d3,Noise complaint due to loud speakers at Ward 14,normal,other,synthetic
+89899f55e4,Noise complaint due to loud speakers at Central Park,normal,other,synthetic
+300445bc75,Damaged speed breaker making vehicles jump at Green Avenue,normal,road,synthetic
+79444203af,Broken public bench near Railway Crossing,urgent,other,synthetic
+89b99d054e,Illegal parking blocking access near Old Market,urgent,other,synthetic
+23abe77392,Noise complaint due to loud speakers at School Gate,normal,other,synthetic
+5c009d3a86,Garbage pile not collected for days near Central Park,normal,sanitation,synthetic
+4fc7a972cb,Overflowing dustbin causing smell at Green Avenue,urgent,sanitation,synthetic
+70c863d914,Broken public tap wasting water at Bus Stand,urgent,water,synthetic
+872fe6aa69,Open sewage causing foul smell near Bus Stand,urgent,health,synthetic
+81c9dfeba4,Vandalized signboard at School Gate,normal,other,synthetic
+18206826b1,Broken public tap wasting water at Sector 9,normal,water,synthetic
+668eb5da65,Unhygienic conditions around public clinic at School Gate,urgent,health,synthetic
+a985e5788f,Open waste dumping spotted behind School Gate,normal,sanitation,synthetic
+6afc07b454,Blocked drain causing stagnant water at River Bridge,urgent,sanitation,synthetic
+de3d1e7a9c,Litter scattered around market area near Hospital Road,urgent,sanitation,synthetic
+b6dc4f83b7,Unauthorized street vendor congestion at Stadium Entrance,normal,other,synthetic
+1543b8d9aa,Open sewage causing foul smell near Green Avenue,urgent,health,synthetic
+18898f8536,Low pressure water supply reported around Library Circle,normal,water,synthetic
+2e275d7b7e,Electric pole wires hanging dangerously at River Bridge,urgent,electricity,synthetic
+df22a5f43e,No water supply in houses near Old Market since morning,urgent,water,synthetic
+f1f1e8c135,Vandalized signboard at Hospital Road,urgent,other,synthetic
+bbc2312fa2,Damaged speed breaker making vehicles jump at Hospital Road,normal,road,synthetic
+ef50fe1686,Broken public tap wasting water at Hospital Road,normal,water,synthetic
+0aef8cf9de,No water supply in houses near Sector 9 since morning,normal,water,synthetic
+a80658706a,Construction debris blocking part of the road at Bus Stand,normal,road,synthetic
+4661b964bd,Broken public bench near Main Square,normal,other,synthetic
+fa2c24326f,Street light not working at School Gate,normal,electricity,synthetic
+faf623ecd7,Transformer making loud noise near Green Avenue,normal,electricity,synthetic
+55bb2b870e,Dog bite incident reported at Railway Crossing,urgent,health,synthetic
+f44d363dba,Transformer making loud noise near Railway Crossing,urgent,electricity,synthetic
+821e85ef97,Broken public tap wasting water at Temple Street,normal,water,synthetic
+c5b6dfea35,Medical waste dumped openly behind Railway Crossing,normal,health,synthetic
+6113133a7f,Electric pole wires hanging dangerously at Hospital Road,urgent,electricity,synthetic
+cff810e3bc,Frequent power cuts happening near Community Hall,normal,electricity,synthetic
+90ea83ddbe,Water leakage from main pipeline at Main Square,urgent,water,synthetic
+0a3cae2c7f,Dog bite incident reported at Main Square,urgent,health,synthetic
+cce84c0fa9,Unauthorized street vendor congestion at Railway Crossing,urgent,other,synthetic
+3e73f04213,Litter scattered around market area near Ward 14,normal,sanitation,synthetic
+d7d2a987dc,Frequent power cuts happening near Green Avenue,urgent,electricity,synthetic
+48a116aa6d,Contaminated muddy water coming from tap at Bus Stand,urgent,water,synthetic
+d33b6d7c41,Construction debris blocking part of the road at Central Park,normal,road,synthetic
+463f63452d,Street light not working at Central Park,normal,electricity,synthetic
+5cdfc43356,Voltage fluctuation damaging appliances around Railway Crossing,normal,electricity,synthetic
+93adf0e8c2,Open waste dumping spotted behind Hospital Road,urgent,sanitation,synthetic
+b358e34fbc,Unhygienic conditions around public clinic at Ward 14,normal,health,synthetic
+dfee9f267d,No water supply in houses near School Gate since morning,normal,water,synthetic
+b0cc4ad547,Open waste dumping spotted behind River Bridge,normal,sanitation,synthetic
+90d7e423e6,Open sewage causing foul smell near Community Hall,urgent,health,synthetic
+2b43b65354,Open waste dumping spotted behind Railway Crossing,urgent,sanitation,synthetic
+078da0e7d8,Noise complaint due to loud speakers at River Bridge,urgent,other,synthetic
+601b44c417,Street light not working at Stadium Entrance,normal,electricity,synthetic
+8bc06f581c,Blocked drain causing stagnant water at School Gate,urgent,sanitation,synthetic
+927a4c25cf,Damaged speed breaker making vehicles jump at Railway Crossing,normal,road,synthetic
+e60ca3e097,Contaminated muddy water coming from tap at School Gate,urgent,water,synthetic
+8d4e350234,Overflowing dustbin causing smell at River Bridge,urgent,sanitation,synthetic
+7deda867df,Noise complaint due to loud speakers at Stadium Entrance,normal,other,synthetic
+66584ea05f,Unauthorized street vendor congestion at Temple Street,normal,other,synthetic
+98cc20f0fe,Unauthorized street vendor congestion at Bus Stand,urgent,other,synthetic
+fb7b9b5b23,Voltage fluctuation damaging appliances around Hospital Road,urgent,electricity,synthetic
+1ff2cc548d,Vandalized signboard at Sector 9,normal,other,synthetic
+9e96691446,Road surface broken and creating traffic jam at Sector 9,urgent,road,synthetic
+832bca202a,Garbage pile not collected for days near Community Hall,urgent,sanitation,synthetic
+eae6a94c98,Broken public tap wasting water at Main Square,normal,water,synthetic
+586cc95c01,Litter scattered around market area near Sector 9,normal,sanitation,synthetic
+78e83e4c9b,No water supply in houses near Central Park since morning,normal,water,synthetic
+b9961f9bc1,Open waste dumping spotted behind Ward 14,urgent,sanitation,synthetic
+b516f670ca,Garbage pile not collected for days near Library Circle,normal,sanitation,synthetic
+8aef3b2c51,Unhygienic conditions around public clinic at Temple Street,normal,health,synthetic
+e95e33e75e,No water supply in houses near Community Hall since morning,normal,water,synthetic
+4308c29c0d,Vandalized signboard at Main Square,normal,other,synthetic
+56f40eb32b,Electric pole wires hanging dangerously at Old Market,urgent,electricity,synthetic
+749d5cdc55,Frequent power cuts happening near Hospital Road,normal,electricity,synthetic
+f3c9f74479,Street light not working at River Bridge,urgent,electricity,synthetic
+5c11165728,Broken public bench near Bus Stand,normal,other,synthetic
+603ef71551,Medical waste dumped openly behind Library Circle,normal,health,synthetic
+aca53b77a1,Open waste dumping spotted behind Central Park,normal,sanitation,synthetic
+cc8f212695,Garbage pile not collected for days near Ward 14,normal,sanitation,synthetic
+0c7d0c8432,Overflowing dustbin causing smell at Bus Stand,urgent,sanitation,synthetic
+f67186e43c,Vandalized signboard at Library Circle,normal,other,synthetic
+8f455a90f1,Open sewage causing foul smell near Old Market,urgent,health,synthetic
+c14a43c652,Broken public bench near Old Market,normal,other,synthetic
+0557d822e8,Large pothole near Library Circle causing accidents,urgent,road,synthetic
+524fb49b40,Open sewage causing foul smell near Ward 14,urgent,health,synthetic
+3f50a7d3a1,Large pothole near Sector 9 causing accidents,urgent,road,synthetic
+5b499827d2,Garbage pile not collected for days near Hospital Road,urgent,sanitation,synthetic
+283344a67d,Voltage fluctuation damaging appliances around Sector 9,urgent,electricity,synthetic
+7512abe01b,Contaminated muddy water coming from tap at River Bridge,urgent,water,synthetic
+fd76c67c3c,Large pothole near Bus Stand causing accidents,urgent,road,synthetic
+bcf33f77a8,Unhygienic conditions around public clinic at Hospital Road,normal,health,synthetic
+a7de879b5d,Water leakage from main pipeline at River Bridge,urgent,water,synthetic
+ac8e00f17a,Large pothole near Hospital Road causing accidents,urgent,road,synthetic
+b8395e4579,Garbage pile not collected for days near Stadium Entrance,normal,sanitation,synthetic
+860f3a9a94,Water leakage from main pipeline at Central Park,urgent,water,synthetic
+dc5d60db37,Overflowing dustbin causing smell at Ward 14,urgent,sanitation,synthetic

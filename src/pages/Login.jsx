@@ -80,6 +80,15 @@ const Login = () => {
         if (error) throw error;
 
         if (data.user) {
+          // If user already has a stored user_type in metadata, enforce it
+          const metaType = data.user.user_metadata?.user_type;
+          if (metaType && metaType !== loginType) {
+            showNotification(`Account registered as ${metaType}. Please choose the correct role.`, 'error');
+            // Immediately sign out this session attempt
+            await supabase.auth.signOut();
+            setLoading(false);
+            return;
+          }
           // Check if user exists in our users table, if not create them
           const { data: userData, error: userError } = await supabase
             .from('users')
@@ -138,6 +147,27 @@ const Login = () => {
     setIsSignUp(!isSignUp);
     setPassword('');
     setFullName('');
+  };
+
+  const handleGoogleSignIn = async () => {
+    if (!loginType) {
+      showNotification('Select Citizen or Government first', 'error');
+      return;
+    }
+    try {
+      // Store intended role so callback can pick it up
+      localStorage.setItem('pendingUserType', loginType);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
+      });
+      if (error) throw error;
+    } catch (e) {
+      console.error('Google sign-in error', e);
+      showNotification(e.message || 'Google sign-in failed', 'error');
+    }
   };
 
   return (
@@ -370,6 +400,33 @@ const Login = () => {
                       ) : (
                         isSignUp ? 'Create Account' : 'Login'
                       )}
+                    </motion.button>
+
+                    <div className="relative my-6">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-300" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-white px-2 text-gray-500">Or continue with</span>
+                      </div>
+                    </div>
+
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleGoogleSignIn}
+                      className="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-lg transition-colors flex items-center justify-center mb-4 bg-white shadow-sm"
+                    >
+                      <span className="mr-3 inline-block">
+                        <svg width="20" height="20" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M533.5 278.4c0-18.5-1.5-37-4.7-55H272v104.2h146.9c-6.3 34.4-25.6 63.6-54.5 82.7v68h87.7c51.3-47.3 81.4-117 81.4-199.9z" fill="#4285F4"/>
+                          <path d="M272 544.3c73.7 0 135.6-24.4 180.8-66.1l-87.7-68c-24.4 16.3-55.7 25.8-93.1 25.8-71.5 0-132.2-48.2-153.9-112.9H27.5v70.9c45.8 90.5 140 150.3 244.5 150.3z" fill="#34A853"/>
+                          <path d="M118.1 322.9c-10.6-31.6-10.6-65.9 0-97.5V154.5H27.5c-39.6 78.9-39.6 172.2 0 251.1l90.6-70.9z" fill="#FBBC05"/>
+                          <path d="M272 107.7c39.9-.6 78.4 14.6 107.7 42.5l80.2-80.2C407.4 24.6 348.7-.5 272 0 167.5 0 73.3 59.8 27.5 150.3l90.6 70.9C139.3 155.8 200.5 107.7 272 107.7z" fill="#EA4335"/>
+                        </svg>
+                      </span>
+                      Continue with Google
                     </motion.button>
                     
                     <div className="text-center">

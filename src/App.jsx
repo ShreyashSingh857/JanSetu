@@ -13,26 +13,24 @@ import MapView1 from './components/Citizen/MapView1';
 import Myreport from './components/Citizen/Myreport';
 import 'leaflet/dist/leaflet.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import OAuthCallback from './pages/OAuthCallback';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
-// Protected Route component
+// Protected Route component using Supabase auth context
 const ProtectedRoute = ({ children }) => {
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  return isLoggedIn ? children : <Navigate to="/login" />;
+  const { user, initializing } = useAuth();
+  if (initializing) return null; // or a spinner
+  return user ? children : <Navigate to="/login" />;
 };
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route 
-          path="/login" 
-          element={
-            localStorage.getItem('isLoggedIn') === 'true' 
-              ? <Navigate to={localStorage.getItem('userType') === 'citizen' ? '/citizen' : '/government'} /> 
-              : <Login />
-          } 
-        />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/auth/callback" element={<OAuthCallback />} />
         
         {/* Citizen Routes */}
         <Route 
@@ -102,16 +100,17 @@ export default function App() {
           } 
         />
         
-        {/* fallback route */}
-        <Route
-          path="*"
-          element={
-            <div className="min-h-screen flex items-center justify-center text-2xl text-red-600">
-              404 - Page Not Found
-            </div>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+          {/* fallback route */}
+          <Route
+            path="*"
+            element={
+              <div className="min-h-screen flex items-center justify-center text-2xl text-red-600">
+                404 - Page Not Found
+              </div>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }

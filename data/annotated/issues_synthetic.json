@@ -1,0 +1,2180 @@
+{
+  "generated_at": "2025-09-19T11:01:50.876952",
+  "num_samples": 360,
+  "classes": {
+    "urgency": [
+      "urgent",
+      "normal"
+    ],
+    "category": [
+      "road",
+      "sanitation",
+      "water",
+      "electricity",
+      "health",
+      "other"
+    ]
+  },
+  "data": [
+    {
+      "id": "b3d6197bc0",
+      "text": "No water supply in houses near Stadium Entrance since morning",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "b33dbe104a",
+      "text": "Large pothole near Temple Street causing accidents",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "57ce0d6443",
+      "text": "Unauthorized street vendor congestion at Old Market",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "269054b15a",
+      "text": "No water supply in houses near Main Square since morning",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "cc1d39453a",
+      "text": "Broken public bench near Sector 9",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "8b598e4742",
+      "text": "Illegal parking blocking access near Temple Street",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "f1928c5108",
+      "text": "Overflowing dustbin causing smell at Railway Crossing",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "7af57386c4",
+      "text": "Frequent power cuts happening near Railway Crossing",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "37c4abc3c4",
+      "text": "Transformer making loud noise near Main Square",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "b97665143c",
+      "text": "Noise complaint due to loud speakers at Community Hall",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "5d85f632da",
+      "text": "Electric pole wires hanging dangerously at Library Circle",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "be89d4e491",
+      "text": "Road surface broken and creating traffic jam at Ward 14",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "aace93ad88",
+      "text": "Mosquito breeding due to stagnant water at Central Park",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "b300806cf2",
+      "text": "Frequent power cuts happening near Ward 14",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "277b43d361",
+      "text": "No water supply in houses near Library Circle since morning",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "cf70d6d8cf",
+      "text": "Unhygienic conditions around public clinic at Stadium Entrance",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "43f896a211",
+      "text": "Dog bite incident reported at Community Hall",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "3004f9218f",
+      "text": "Overflowing dustbin causing smell at Hospital Road",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "4b1b0e1430",
+      "text": "Unhygienic conditions around public clinic at River Bridge",
+      "urgency": "normal",
+      "category": "health"
+    },
+    {
+      "id": "e6343141b4",
+      "text": "Mosquito breeding due to stagnant water at Temple Street",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "e8785295b1",
+      "text": "Voltage fluctuation damaging appliances around Bus Stand",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "3ff747227d",
+      "text": "Noise complaint due to loud speakers at Railway Crossing",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "4ff020189a",
+      "text": "Construction debris blocking part of the road at Old Market",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "4c194275c2",
+      "text": "Dog bite incident reported at Central Park",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "4a29e2a5a2",
+      "text": "Faded lane markings on busy junction at Sector 9",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "07964a23e9",
+      "text": "Unauthorized street vendor congestion at Ward 14",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "c714e68eea",
+      "text": "Transformer making loud noise near Ward 14",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "9ee6bfe6f8",
+      "text": "Frequent power cuts happening near Library Circle",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "aebc25b696",
+      "text": "Transformer making loud noise near Library Circle",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "66bf0f3889",
+      "text": "Transformer making loud noise near Temple Street",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "316b623b5d",
+      "text": "Construction debris blocking part of the road at River Bridge",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "5dc3293a7f",
+      "text": "Electric pole wires hanging dangerously at Temple Street",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "79c08fec77",
+      "text": "Large pothole near Ward 14 causing accidents",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "346fab2693",
+      "text": "Broken public bench near Library Circle",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "bdf03467ad",
+      "text": "Vandalized signboard at Old Market",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "facbcf9a59",
+      "text": "Open waste dumping spotted behind Sector 9",
+      "urgency": "normal",
+      "category": "sanitation"
+    },
+    {
+      "id": "bea144a0a5",
+      "text": "Blocked drain causing stagnant water at Central Park",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "65fc0f5a10",
+      "text": "Construction debris blocking part of the road at Temple Street",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "3ecffa13ac",
+      "text": "Noise complaint due to loud speakers at Library Circle",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "323094039c",
+      "text": "Transformer making loud noise near School Gate",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "5932b39dca",
+      "text": "Damaged speed breaker making vehicles jump at Ward 14",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "34abcd6891",
+      "text": "No water supply in houses near Hospital Road since morning",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "8f53b4374e",
+      "text": "Unhygienic conditions around public clinic at Sector 9",
+      "urgency": "normal",
+      "category": "health"
+    },
+    {
+      "id": "a79d2d4b68",
+      "text": "Road surface broken and creating traffic jam at Stadium Entrance",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "c4ee19f7fd",
+      "text": "Contaminated muddy water coming from tap at Temple Street",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "2b2123d070",
+      "text": "Frequent power cuts happening near School Gate",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "5b65285273",
+      "text": "Contaminated muddy water coming from tap at Green Avenue",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "d4d6ef4bf9",
+      "text": "Garbage pile not collected for days near School Gate",
+      "urgency": "normal",
+      "category": "sanitation"
+    },
+    {
+      "id": "4ff020189a",
+      "text": "Construction debris blocking part of the road at Old Market",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "be89d4e491",
+      "text": "Road surface broken and creating traffic jam at Ward 14",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "de4b94dfa6",
+      "text": "Road surface broken and creating traffic jam at Railway Crossing",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "41c8f9ddec",
+      "text": "Garbage pile not collected for days near Green Avenue",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "7d772f783c",
+      "text": "Blocked drain causing stagnant water at Railway Crossing",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "f25a00c80b",
+      "text": "Unauthorized street vendor congestion at Library Circle",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "07964a23e9",
+      "text": "Unauthorized street vendor congestion at Ward 14",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "4232d0a966",
+      "text": "Blocked drain causing stagnant water at Ward 14",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "e90c039294",
+      "text": "Damaged speed breaker making vehicles jump at River Bridge",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "be89d4e491",
+      "text": "Road surface broken and creating traffic jam at Ward 14",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "241766c60c",
+      "text": "Blocked drain causing stagnant water at Hospital Road",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "db8e138d39",
+      "text": "Electric pole wires hanging dangerously at Sector 9",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "2794ad3680",
+      "text": "Water leakage from main pipeline at Temple Street",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "dbaf97bff0",
+      "text": "Litter scattered around market area near Temple Street",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "5e2e0428bc",
+      "text": "Large pothole near Central Park causing accidents",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "a79d2d4b68",
+      "text": "Road surface broken and creating traffic jam at Stadium Entrance",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "ece667b06d",
+      "text": "Voltage fluctuation damaging appliances around Community Hall",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "6e27d09169",
+      "text": "Open sewage causing foul smell near Central Park",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "39b2662529",
+      "text": "Street light not working at Ward 14",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "02dab0eeed",
+      "text": "Dog bite incident reported at School Gate",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "71ce9c8095",
+      "text": "Dog bite incident reported at Green Avenue",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "1af30fbd0c",
+      "text": "Frequent power cuts happening near Old Market",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "66f8327647",
+      "text": "Broken public bench near Central Park",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "d60de7af5c",
+      "text": "Medical waste dumped openly behind Community Hall",
+      "urgency": "normal",
+      "category": "health"
+    },
+    {
+      "id": "760a84b0ef",
+      "text": "Vandalized signboard at Stadium Entrance",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "1646af104c",
+      "text": "Dog bite incident reported at Stadium Entrance",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "489de7b5f2",
+      "text": "Low pressure water supply reported around Stadium Entrance",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "7af57386c4",
+      "text": "Frequent power cuts happening near Railway Crossing",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "5d34c0ec92",
+      "text": "Unauthorized street vendor congestion at Community Hall",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "f1666b8752",
+      "text": "Dog bite incident reported at River Bridge",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "5b94656075",
+      "text": "Large pothole near Stadium Entrance causing accidents",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "8be3c16dab",
+      "text": "Mosquito breeding due to stagnant water at Sector 9",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "d15a186c0c",
+      "text": "Water leakage from main pipeline at Bus Stand",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "27caff5c76",
+      "text": "Overflowing dustbin causing smell at Community Hall",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "e0d7abcc44",
+      "text": "Garbage pile not collected for days near Sector 9",
+      "urgency": "normal",
+      "category": "sanitation"
+    },
+    {
+      "id": "827584fc90",
+      "text": "Construction debris blocking part of the road at Hospital Road",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "a79d2d4b68",
+      "text": "Road surface broken and creating traffic jam at Stadium Entrance",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "8ca3370d1c",
+      "text": "Medical waste dumped openly behind Hospital Road",
+      "urgency": "normal",
+      "category": "health"
+    },
+    {
+      "id": "ece667b06d",
+      "text": "Voltage fluctuation damaging appliances around Community Hall",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "5540addb03",
+      "text": "Voltage fluctuation damaging appliances around Library Circle",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "e8982c702e",
+      "text": "Unhygienic conditions around public clinic at Main Square",
+      "urgency": "normal",
+      "category": "health"
+    },
+    {
+      "id": "e000db90e0",
+      "text": "Construction debris blocking part of the road at Main Square",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "a256ac8a95",
+      "text": "Mosquito breeding due to stagnant water at Old Market",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "904bf4951f",
+      "text": "Dog bite incident reported at Hospital Road",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "bb5a42fdda",
+      "text": "Overflowing dustbin causing smell at Stadium Entrance",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "8f28a88add",
+      "text": "Vandalized signboard at Community Hall",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "d60de7af5c",
+      "text": "Medical waste dumped openly behind Community Hall",
+      "urgency": "normal",
+      "category": "health"
+    },
+    {
+      "id": "ff553d96c5",
+      "text": "Unauthorized street vendor congestion at Main Square",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "c178e50269",
+      "text": "Litter scattered around market area near Railway Crossing",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "f0bcbb8168",
+      "text": "Illegal parking blocking access near Green Avenue",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "9dd369e416",
+      "text": "Open waste dumping spotted behind Library Circle",
+      "urgency": "normal",
+      "category": "sanitation"
+    },
+    {
+      "id": "7e6fec0b10",
+      "text": "Voltage fluctuation damaging appliances around Old Market",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "c01a90c4c0",
+      "text": "Frequent power cuts happening near Main Square",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "7dcf845a71",
+      "text": "Noise complaint due to loud speakers at Sector 9",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "07964a23e9",
+      "text": "Unauthorized street vendor congestion at Ward 14",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "18ceb62203",
+      "text": "Mosquito breeding due to stagnant water at Ward 14",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "680261a43d",
+      "text": "Road surface broken and creating traffic jam at Hospital Road",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "c3c795b156",
+      "text": "Water leakage from main pipeline at Library Circle",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "728c834733",
+      "text": "Illegal parking blocking access near Ward 14",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "728c834733",
+      "text": "Illegal parking blocking access near Ward 14",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "03009bd44e",
+      "text": "Large pothole near Main Square causing accidents",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "ab993d90b6",
+      "text": "Transformer making loud noise near Community Hall",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "a5d6eb5415",
+      "text": "Mosquito breeding due to stagnant water at Library Circle",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "75047ca31a",
+      "text": "Street light not working at Community Hall",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "9ee6bfe6f8",
+      "text": "Frequent power cuts happening near Library Circle",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "bb5a42fdda",
+      "text": "Overflowing dustbin causing smell at Stadium Entrance",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "ac174faa89",
+      "text": "Water leakage from main pipeline at Sector 9",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "d9701057d0",
+      "text": "Faded lane markings on busy junction at Railway Crossing",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "8c56905373",
+      "text": "Dog bite incident reported at Library Circle",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "5842791a64",
+      "text": "Water leakage from main pipeline at Stadium Entrance",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "d53c3f0748",
+      "text": "No water supply in houses near River Bridge since morning",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "c5fd4bbcd6",
+      "text": "Low pressure water supply reported around Bus Stand",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "827584fc90",
+      "text": "Construction debris blocking part of the road at Hospital Road",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "91492e3b45",
+      "text": "Dog bite incident reported at Bus Stand",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "9f38c99a13",
+      "text": "Contaminated muddy water coming from tap at Railway Crossing",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "dd1fde825a",
+      "text": "Medical waste dumped openly behind Ward 14",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "8c56905373",
+      "text": "Dog bite incident reported at Library Circle",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "592711d3b1",
+      "text": "Blocked drain causing stagnant water at Sector 9",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "ce79839540",
+      "text": "Garbage pile not collected for days near Main Square",
+      "urgency": "normal",
+      "category": "sanitation"
+    },
+    {
+      "id": "f1666b8752",
+      "text": "Dog bite incident reported at River Bridge",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "dced5f6bff",
+      "text": "Mosquito breeding due to stagnant water at Stadium Entrance",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "c86f33762c",
+      "text": "Unhygienic conditions around public clinic at Railway Crossing",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "444c22a81b",
+      "text": "Contaminated muddy water coming from tap at Ward 14",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "07964a23e9",
+      "text": "Unauthorized street vendor congestion at Ward 14",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "f1928c5108",
+      "text": "Overflowing dustbin causing smell at Railway Crossing",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "277b43d361",
+      "text": "No water supply in houses near Library Circle since morning",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "aaa9d4774a",
+      "text": "Litter scattered around market area near Community Hall",
+      "urgency": "normal",
+      "category": "sanitation"
+    },
+    {
+      "id": "c04e2284c9",
+      "text": "Faded lane markings on busy junction at Temple Street",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "6ed5eab989",
+      "text": "Road surface broken and creating traffic jam at Bus Stand",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "5b65285273",
+      "text": "Contaminated muddy water coming from tap at Green Avenue",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "c01a90c4c0",
+      "text": "Frequent power cuts happening near Main Square",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "dbaf97bff0",
+      "text": "Litter scattered around market area near Temple Street",
+      "urgency": "normal",
+      "category": "sanitation"
+    },
+    {
+      "id": "66f8327647",
+      "text": "Broken public bench near Central Park",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "c4ee19f7fd",
+      "text": "Contaminated muddy water coming from tap at Temple Street",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "ab993d90b6",
+      "text": "Transformer making loud noise near Community Hall",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "213acf654a",
+      "text": "Blocked drain causing stagnant water at Main Square",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "c97c3c6e9c",
+      "text": "Open sewage causing foul smell near River Bridge",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "5b65285273",
+      "text": "Contaminated muddy water coming from tap at Green Avenue",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "90fd079146",
+      "text": "Mosquito breeding due to stagnant water at School Gate",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "704c6acc97",
+      "text": "Litter scattered around market area near Green Avenue",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "02c1a2cdcb",
+      "text": "Contaminated muddy water coming from tap at Main Square",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "bbf506f99d",
+      "text": "Litter scattered around market area near Central Park",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "a9301d9c4c",
+      "text": "Water leakage from main pipeline at Green Avenue",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "39708d7ec3",
+      "text": "Faded lane markings on busy junction at River Bridge",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "99d9ff200e",
+      "text": "Mosquito breeding due to stagnant water at Railway Crossing",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "9ee6bfe6f8",
+      "text": "Frequent power cuts happening near Library Circle",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "825a4a77e0",
+      "text": "Electric pole wires hanging dangerously at Ward 14",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "454e19e47c",
+      "text": "Damaged speed breaker making vehicles jump at Sector 9",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "bf58da7ab5",
+      "text": "Street light not working at Library Circle",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "37c4abc3c4",
+      "text": "Transformer making loud noise near Main Square",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "521203207c",
+      "text": "Street light not working at Green Avenue",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "9d3f1c5899",
+      "text": "Damaged speed breaker making vehicles jump at Central Park",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "4e285df023",
+      "text": "Low pressure water supply reported around Temple Street",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "fad4a5a632",
+      "text": "Overflowing dustbin causing smell at Old Market",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "94ec8e0585",
+      "text": "Large pothole near Railway Crossing causing accidents",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "d06f01d412",
+      "text": "Blocked drain causing stagnant water at Bus Stand",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "dd1fde825a",
+      "text": "Medical waste dumped openly behind Ward 14",
+      "urgency": "normal",
+      "category": "health"
+    },
+    {
+      "id": "a9301d9c4c",
+      "text": "Water leakage from main pipeline at Green Avenue",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "b7dc28a6ac",
+      "text": "Broken public bench near School Gate",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "c8a1865ee3",
+      "text": "Faded lane markings on busy junction at Stadium Entrance",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "062a136848",
+      "text": "Broken public tap wasting water at Old Market",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "4b1b0e1430",
+      "text": "Unhygienic conditions around public clinic at River Bridge",
+      "urgency": "normal",
+      "category": "health"
+    },
+    {
+      "id": "6b2f332002",
+      "text": "Voltage fluctuation damaging appliances around River Bridge",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "bd5ae43347",
+      "text": "Broken public bench near Hospital Road",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "990363d857",
+      "text": "Frequent power cuts happening near River Bridge",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "dd1fde825a",
+      "text": "Medical waste dumped openly behind Ward 14",
+      "urgency": "normal",
+      "category": "health"
+    },
+    {
+      "id": "cfd6402db5",
+      "text": "Broken public bench near Ward 14",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "4ac19aec01",
+      "text": "Electric pole wires hanging dangerously at Green Avenue",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "fa18725758",
+      "text": "Frequent power cuts happening near Temple Street",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "5ef7a34ff7",
+      "text": "Low pressure water supply reported around Old Market",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "f25a00c80b",
+      "text": "Unauthorized street vendor congestion at Library Circle",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "60b6f99818",
+      "text": "Low pressure water supply reported around Main Square",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "030af3b803",
+      "text": "Garbage pile not collected for days near Railway Crossing",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "582e2d798b",
+      "text": "Broken public bench near Green Avenue",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "47eb01d2d6",
+      "text": "Construction debris blocking part of the road at Community Hall",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "767cf0b4fc",
+      "text": "Faded lane markings on busy junction at Old Market",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "5b2215b164",
+      "text": "Vandalized signboard at Central Park",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "90fd079146",
+      "text": "Mosquito breeding due to stagnant water at School Gate",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "99752fb7f2",
+      "text": "Low pressure water supply reported around Railway Crossing",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "74e1d6005d",
+      "text": "Contaminated muddy water coming from tap at Hospital Road",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "03009bd44e",
+      "text": "Large pothole near Main Square causing accidents",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "2794ad3680",
+      "text": "Water leakage from main pipeline at Temple Street",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "631807a7c0",
+      "text": "Blocked drain causing stagnant water at Community Hall",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "8f5ca62a7b",
+      "text": "Faded lane markings on busy junction at Bus Stand",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "ece667b06d",
+      "text": "Voltage fluctuation damaging appliances around Community Hall",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "0e525ac7d3",
+      "text": "Noise complaint due to loud speakers at Ward 14",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "89899f55e4",
+      "text": "Noise complaint due to loud speakers at Central Park",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "300445bc75",
+      "text": "Damaged speed breaker making vehicles jump at Green Avenue",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "79444203af",
+      "text": "Broken public bench near Railway Crossing",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "e90c039294",
+      "text": "Damaged speed breaker making vehicles jump at River Bridge",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "89b99d054e",
+      "text": "Illegal parking blocking access near Old Market",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "23abe77392",
+      "text": "Noise complaint due to loud speakers at School Gate",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "5c009d3a86",
+      "text": "Garbage pile not collected for days near Central Park",
+      "urgency": "normal",
+      "category": "sanitation"
+    },
+    {
+      "id": "062a136848",
+      "text": "Broken public tap wasting water at Old Market",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "4fc7a972cb",
+      "text": "Overflowing dustbin causing smell at Green Avenue",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "70c863d914",
+      "text": "Broken public tap wasting water at Bus Stand",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "60b6f99818",
+      "text": "Low pressure water supply reported around Main Square",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "592711d3b1",
+      "text": "Blocked drain causing stagnant water at Sector 9",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "872fe6aa69",
+      "text": "Open sewage causing foul smell near Bus Stand",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "91492e3b45",
+      "text": "Dog bite incident reported at Bus Stand",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "81c9dfeba4",
+      "text": "Vandalized signboard at School Gate",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "18206826b1",
+      "text": "Broken public tap wasting water at Sector 9",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "668eb5da65",
+      "text": "Unhygienic conditions around public clinic at School Gate",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "a985e5788f",
+      "text": "Open waste dumping spotted behind School Gate",
+      "urgency": "normal",
+      "category": "sanitation"
+    },
+    {
+      "id": "6afc07b454",
+      "text": "Blocked drain causing stagnant water at River Bridge",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "de3d1e7a9c",
+      "text": "Litter scattered around market area near Hospital Road",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "b6dc4f83b7",
+      "text": "Unauthorized street vendor congestion at Stadium Entrance",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "1543b8d9aa",
+      "text": "Open sewage causing foul smell near Green Avenue",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "18898f8536",
+      "text": "Low pressure water supply reported around Library Circle",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "2e275d7b7e",
+      "text": "Electric pole wires hanging dangerously at River Bridge",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "df22a5f43e",
+      "text": "No water supply in houses near Old Market since morning",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "d06f01d412",
+      "text": "Blocked drain causing stagnant water at Bus Stand",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "f1f1e8c135",
+      "text": "Vandalized signboard at Hospital Road",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "bbc2312fa2",
+      "text": "Damaged speed breaker making vehicles jump at Hospital Road",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "5c009d3a86",
+      "text": "Garbage pile not collected for days near Central Park",
+      "urgency": "normal",
+      "category": "sanitation"
+    },
+    {
+      "id": "a985e5788f",
+      "text": "Open waste dumping spotted behind School Gate",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "b3d6197bc0",
+      "text": "No water supply in houses near Stadium Entrance since morning",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "ef50fe1686",
+      "text": "Broken public tap wasting water at Hospital Road",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "0aef8cf9de",
+      "text": "No water supply in houses near Sector 9 since morning",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "a80658706a",
+      "text": "Construction debris blocking part of the road at Bus Stand",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "1af30fbd0c",
+      "text": "Frequent power cuts happening near Old Market",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "b300806cf2",
+      "text": "Frequent power cuts happening near Ward 14",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "4661b964bd",
+      "text": "Broken public bench near Main Square",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "fa2c24326f",
+      "text": "Street light not working at School Gate",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "3004f9218f",
+      "text": "Overflowing dustbin causing smell at Hospital Road",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "faf623ecd7",
+      "text": "Transformer making loud noise near Green Avenue",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "55bb2b870e",
+      "text": "Dog bite incident reported at Railway Crossing",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "f44d363dba",
+      "text": "Transformer making loud noise near Railway Crossing",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "94ec8e0585",
+      "text": "Large pothole near Railway Crossing causing accidents",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "821e85ef97",
+      "text": "Broken public tap wasting water at Temple Street",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "c5b6dfea35",
+      "text": "Medical waste dumped openly behind Railway Crossing",
+      "urgency": "normal",
+      "category": "health"
+    },
+    {
+      "id": "6113133a7f",
+      "text": "Electric pole wires hanging dangerously at Hospital Road",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "cff810e3bc",
+      "text": "Frequent power cuts happening near Community Hall",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "90ea83ddbe",
+      "text": "Water leakage from main pipeline at Main Square",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "0a3cae2c7f",
+      "text": "Dog bite incident reported at Main Square",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "81c9dfeba4",
+      "text": "Vandalized signboard at School Gate",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "23abe77392",
+      "text": "Noise complaint due to loud speakers at School Gate",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "cce84c0fa9",
+      "text": "Unauthorized street vendor congestion at Railway Crossing",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "5d34c0ec92",
+      "text": "Unauthorized street vendor congestion at Community Hall",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "3e73f04213",
+      "text": "Litter scattered around market area near Ward 14",
+      "urgency": "normal",
+      "category": "sanitation"
+    },
+    {
+      "id": "d7d2a987dc",
+      "text": "Frequent power cuts happening near Green Avenue",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "3004f9218f",
+      "text": "Overflowing dustbin causing smell at Hospital Road",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "990363d857",
+      "text": "Frequent power cuts happening near River Bridge",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "65fc0f5a10",
+      "text": "Construction debris blocking part of the road at Temple Street",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "48a116aa6d",
+      "text": "Contaminated muddy water coming from tap at Bus Stand",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "d33b6d7c41",
+      "text": "Construction debris blocking part of the road at Central Park",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "d06f01d412",
+      "text": "Blocked drain causing stagnant water at Bus Stand",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "dd1fde825a",
+      "text": "Medical waste dumped openly behind Ward 14",
+      "urgency": "normal",
+      "category": "health"
+    },
+    {
+      "id": "dced5f6bff",
+      "text": "Mosquito breeding due to stagnant water at Stadium Entrance",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "60b6f99818",
+      "text": "Low pressure water supply reported around Main Square",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "463f63452d",
+      "text": "Street light not working at Central Park",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "8b598e4742",
+      "text": "Illegal parking blocking access near Temple Street",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "5cdfc43356",
+      "text": "Voltage fluctuation damaging appliances around Railway Crossing",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "93adf0e8c2",
+      "text": "Open waste dumping spotted behind Hospital Road",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "2e275d7b7e",
+      "text": "Electric pole wires hanging dangerously at River Bridge",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "b358e34fbc",
+      "text": "Unhygienic conditions around public clinic at Ward 14",
+      "urgency": "normal",
+      "category": "health"
+    },
+    {
+      "id": "dfee9f267d",
+      "text": "No water supply in houses near School Gate since morning",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "b0cc4ad547",
+      "text": "Open waste dumping spotted behind River Bridge",
+      "urgency": "normal",
+      "category": "sanitation"
+    },
+    {
+      "id": "dd1fde825a",
+      "text": "Medical waste dumped openly behind Ward 14",
+      "urgency": "normal",
+      "category": "health"
+    },
+    {
+      "id": "90d7e423e6",
+      "text": "Open sewage causing foul smell near Community Hall",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "2b43b65354",
+      "text": "Open waste dumping spotted behind Railway Crossing",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "c3c795b156",
+      "text": "Water leakage from main pipeline at Library Circle",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "cc1d39453a",
+      "text": "Broken public bench near Sector 9",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "760a84b0ef",
+      "text": "Vandalized signboard at Stadium Entrance",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "078da0e7d8",
+      "text": "Noise complaint due to loud speakers at River Bridge",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "601b44c417",
+      "text": "Street light not working at Stadium Entrance",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "7d772f783c",
+      "text": "Blocked drain causing stagnant water at Railway Crossing",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "bd5ae43347",
+      "text": "Broken public bench near Hospital Road",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "8bc06f581c",
+      "text": "Blocked drain causing stagnant water at School Gate",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "927a4c25cf",
+      "text": "Damaged speed breaker making vehicles jump at Railway Crossing",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "6113133a7f",
+      "text": "Electric pole wires hanging dangerously at Hospital Road",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "bdf03467ad",
+      "text": "Vandalized signboard at Old Market",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "e60ca3e097",
+      "text": "Contaminated muddy water coming from tap at School Gate",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "8d4e350234",
+      "text": "Overflowing dustbin causing smell at River Bridge",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "d33b6d7c41",
+      "text": "Construction debris blocking part of the road at Central Park",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "7deda867df",
+      "text": "Noise complaint due to loud speakers at Stadium Entrance",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "66584ea05f",
+      "text": "Unauthorized street vendor congestion at Temple Street",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "98cc20f0fe",
+      "text": "Unauthorized street vendor congestion at Bus Stand",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "fb7b9b5b23",
+      "text": "Voltage fluctuation damaging appliances around Hospital Road",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "d9701057d0",
+      "text": "Faded lane markings on busy junction at Railway Crossing",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "1ff2cc548d",
+      "text": "Vandalized signboard at Sector 9",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "9e96691446",
+      "text": "Road surface broken and creating traffic jam at Sector 9",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "a256ac8a95",
+      "text": "Mosquito breeding due to stagnant water at Old Market",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "832bca202a",
+      "text": "Garbage pile not collected for days near Community Hall",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "eae6a94c98",
+      "text": "Broken public tap wasting water at Main Square",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "586cc95c01",
+      "text": "Litter scattered around market area near Sector 9",
+      "urgency": "normal",
+      "category": "sanitation"
+    },
+    {
+      "id": "300445bc75",
+      "text": "Damaged speed breaker making vehicles jump at Green Avenue",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "78e83e4c9b",
+      "text": "No water supply in houses near Central Park since morning",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "b9961f9bc1",
+      "text": "Open waste dumping spotted behind Ward 14",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "b516f670ca",
+      "text": "Garbage pile not collected for days near Library Circle",
+      "urgency": "normal",
+      "category": "sanitation"
+    },
+    {
+      "id": "79c08fec77",
+      "text": "Large pothole near Ward 14 causing accidents",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "d9701057d0",
+      "text": "Faded lane markings on busy junction at Railway Crossing",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "8aef3b2c51",
+      "text": "Unhygienic conditions around public clinic at Temple Street",
+      "urgency": "normal",
+      "category": "health"
+    },
+    {
+      "id": "e95e33e75e",
+      "text": "No water supply in houses near Community Hall since morning",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "ab993d90b6",
+      "text": "Transformer making loud noise near Community Hall",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "4308c29c0d",
+      "text": "Vandalized signboard at Main Square",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "99752fb7f2",
+      "text": "Low pressure water supply reported around Railway Crossing",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "56f40eb32b",
+      "text": "Electric pole wires hanging dangerously at Old Market",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "749d5cdc55",
+      "text": "Frequent power cuts happening near Hospital Road",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "f3c9f74479",
+      "text": "Street light not working at River Bridge",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "1646af104c",
+      "text": "Dog bite incident reported at Stadium Entrance",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "ce79839540",
+      "text": "Garbage pile not collected for days near Main Square",
+      "urgency": "normal",
+      "category": "sanitation"
+    },
+    {
+      "id": "07964a23e9",
+      "text": "Unauthorized street vendor congestion at Ward 14",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "5c11165728",
+      "text": "Broken public bench near Bus Stand",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "5540addb03",
+      "text": "Voltage fluctuation damaging appliances around Library Circle",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "603ef71551",
+      "text": "Medical waste dumped openly behind Library Circle",
+      "urgency": "normal",
+      "category": "health"
+    },
+    {
+      "id": "aca53b77a1",
+      "text": "Open waste dumping spotted behind Central Park",
+      "urgency": "normal",
+      "category": "sanitation"
+    },
+    {
+      "id": "9f38c99a13",
+      "text": "Contaminated muddy water coming from tap at Railway Crossing",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "316b623b5d",
+      "text": "Construction debris blocking part of the road at River Bridge",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "a9301d9c4c",
+      "text": "Water leakage from main pipeline at Green Avenue",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "71ce9c8095",
+      "text": "Dog bite incident reported at Green Avenue",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "cc8f212695",
+      "text": "Garbage pile not collected for days near Ward 14",
+      "urgency": "normal",
+      "category": "sanitation"
+    },
+    {
+      "id": "0c7d0c8432",
+      "text": "Overflowing dustbin causing smell at Bus Stand",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "f67186e43c",
+      "text": "Vandalized signboard at Library Circle",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "8f455a90f1",
+      "text": "Open sewage causing foul smell near Old Market",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "4a29e2a5a2",
+      "text": "Faded lane markings on busy junction at Sector 9",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "c14a43c652",
+      "text": "Broken public bench near Old Market",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "fa18725758",
+      "text": "Frequent power cuts happening near Temple Street",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "680261a43d",
+      "text": "Road surface broken and creating traffic jam at Hospital Road",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "0557d822e8",
+      "text": "Large pothole near Library Circle causing accidents",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "524fb49b40",
+      "text": "Open sewage causing foul smell near Ward 14",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "60b6f99818",
+      "text": "Low pressure water supply reported around Main Square",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "3f50a7d3a1",
+      "text": "Large pothole near Sector 9 causing accidents",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "5b499827d2",
+      "text": "Garbage pile not collected for days near Hospital Road",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "277b43d361",
+      "text": "No water supply in houses near Library Circle since morning",
+      "urgency": "normal",
+      "category": "water"
+    },
+    {
+      "id": "283344a67d",
+      "text": "Voltage fluctuation damaging appliances around Sector 9",
+      "urgency": "urgent",
+      "category": "electricity"
+    },
+    {
+      "id": "55bb2b870e",
+      "text": "Dog bite incident reported at Railway Crossing",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "02dab0eeed",
+      "text": "Dog bite incident reported at School Gate",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "7512abe01b",
+      "text": "Contaminated muddy water coming from tap at River Bridge",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "91492e3b45",
+      "text": "Dog bite incident reported at Bus Stand",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "680261a43d",
+      "text": "Road surface broken and creating traffic jam at Hospital Road",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "fd76c67c3c",
+      "text": "Large pothole near Bus Stand causing accidents",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "bcf33f77a8",
+      "text": "Unhygienic conditions around public clinic at Hospital Road",
+      "urgency": "normal",
+      "category": "health"
+    },
+    {
+      "id": "346fab2693",
+      "text": "Broken public bench near Library Circle",
+      "urgency": "normal",
+      "category": "other"
+    },
+    {
+      "id": "760a84b0ef",
+      "text": "Vandalized signboard at Stadium Entrance",
+      "urgency": "urgent",
+      "category": "other"
+    },
+    {
+      "id": "90ea83ddbe",
+      "text": "Water leakage from main pipeline at Main Square",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "02dab0eeed",
+      "text": "Dog bite incident reported at School Gate",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "9e96691446",
+      "text": "Road surface broken and creating traffic jam at Sector 9",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "927a4c25cf",
+      "text": "Damaged speed breaker making vehicles jump at Railway Crossing",
+      "urgency": "normal",
+      "category": "road"
+    },
+    {
+      "id": "a7de879b5d",
+      "text": "Water leakage from main pipeline at River Bridge",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "704c6acc97",
+      "text": "Litter scattered around market area near Green Avenue",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "8be3c16dab",
+      "text": "Mosquito breeding due to stagnant water at Sector 9",
+      "urgency": "urgent",
+      "category": "health"
+    },
+    {
+      "id": "ac8e00f17a",
+      "text": "Large pothole near Hospital Road causing accidents",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "5b65285273",
+      "text": "Contaminated muddy water coming from tap at Green Avenue",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "b8395e4579",
+      "text": "Garbage pile not collected for days near Stadium Entrance",
+      "urgency": "normal",
+      "category": "sanitation"
+    },
+    {
+      "id": "521203207c",
+      "text": "Street light not working at Green Avenue",
+      "urgency": "normal",
+      "category": "electricity"
+    },
+    {
+      "id": "586cc95c01",
+      "text": "Litter scattered around market area near Sector 9",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "860f3a9a94",
+      "text": "Water leakage from main pipeline at Central Park",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "dc5d60db37",
+      "text": "Overflowing dustbin causing smell at Ward 14",
+      "urgency": "urgent",
+      "category": "sanitation"
+    },
+    {
+      "id": "3f50a7d3a1",
+      "text": "Large pothole near Sector 9 causing accidents",
+      "urgency": "urgent",
+      "category": "road"
+    },
+    {
+      "id": "9f38c99a13",
+      "text": "Contaminated muddy water coming from tap at Railway Crossing",
+      "urgency": "urgent",
+      "category": "water"
+    },
+    {
+      "id": "3ff747227d",
+      "text": "Noise complaint due to loud speakers at Railway Crossing",
+      "urgency": "urgent",
+      "category": "other"
+    }
+  ]
+}

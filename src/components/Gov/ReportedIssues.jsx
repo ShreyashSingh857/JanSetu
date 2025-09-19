@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { reportedIssues } from "../../data/fakeData";
+import { useIssues } from "../../hooks/useIssues";
 import NavBarGov from "../Gov/NavBarGov";
 import { FiSearch, FiFilter, FiDownload, FiEye, FiEdit } from "react-icons/fi";
 
@@ -8,22 +8,28 @@ export default function ReportedIssues() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [sectorFilter, setSectorFilter] = useState("All");
-  const [dateFilter, setDateFilter] = useState("All");
+  const [dateFilter, setDateFilter] = useState("All"); // placeholder for future backend range filter
 
-  // Filter issues based on search and filter criteria
-  const filteredIssues = reportedIssues.filter((issue) => {
-    const matchesSearch = issue.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         issue.sector.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         issue.id.toString().includes(searchTerm);
-    
-    const matchesStatus = statusFilter === "All" || issue.status === statusFilter;
-    const matchesSector = sectorFilter === "All" || issue.sector === sectorFilter;
-    
-    return matchesSearch && matchesStatus && matchesSector;
+  const { data: issues = [], isLoading, error } = useIssues({
+    status: statusFilter,
+    category: sectorFilter === 'All' ? undefined : sectorFilter,
+    search: searchTerm || undefined
   });
 
-  // Get unique sectors for filter dropdown
-  const sectors = [...new Set(reportedIssues.map(issue => issue.sector))];
+  // Filter issues based on search and filter criteria
+  const filteredIssues = useMemo(() => {
+    return (issues || []).map(i => ({
+      ...i,
+      sector: i.category, // mapping old UI field name
+      date: new Date(i.created_at).toLocaleDateString()
+    }));
+  }, [issues]);
+
+  const sectors = useMemo(() => {
+    const set = new Set();
+    issues?.forEach(i => { if (i.category) set.add(i.category); });
+    return Array.from(set.values());
+  }, [issues]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -38,7 +44,7 @@ export default function ReportedIssues() {
         {/* Header Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Reported Issues</h1>
-          <p className="text-gray-600">Manage and track all reported civic issues</p>
+          <p className="text-gray-600">Manage and track all reported civic issues (live)</p>
         </div>
 
         {/* Filters and Search Section */}
@@ -92,7 +98,9 @@ export default function ReportedIssues() {
           {/* Action Buttons */}
           <div className="flex justify-between items-center mt-6">
             <div className="text-sm text-gray-500">
-              Showing {filteredIssues.length} of {reportedIssues.length} issues
+              {isLoading && 'Loading issues...'}
+              {error && <span className='text-red-500'>Failed to load</span>}
+              {!isLoading && !error && `Showing ${filteredIssues.length} issues`}
             </div>
             <div className="flex space-x-2">
               <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
@@ -133,7 +141,7 @@ export default function ReportedIssues() {
                 {filteredIssues.map((issue) => (
                   <tr key={issue.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      #{issue.id}
+                      {issue.id}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                       {issue.sector}
@@ -174,7 +182,7 @@ export default function ReportedIssues() {
           </div>
 
           {/* Empty State */}
-          {filteredIssues.length === 0 && (
+          {!isLoading && filteredIssues.length === 0 && (
             <div className="text-center py-12">
               <div className="text-gray-400 mb-2">No issues found</div>
               <p className="text-gray-500 text-sm">
@@ -187,8 +195,7 @@ export default function ReportedIssues() {
         {/* Pagination (optional - can be implemented later) */}
         <div className="mt-6 flex justify-between items-center bg-white px-6 py-3 rounded-xl shadow-sm">
           <div className="text-sm text-gray-700">
-            Showing <span className="font-medium">1</span> to <span className="font-medium">{filteredIssues.length}</span> of{' '}
-            <span className="font-medium">{filteredIssues.length}</span> results
+            Showing <span className="font-medium">{filteredIssues.length}</span> results
           </div>
           <div className="flex space-x-2">
             <button className="px-3 py-1 rounded-md bg-gray-100 text-gray-700 text-sm hover:bg-gray-200">

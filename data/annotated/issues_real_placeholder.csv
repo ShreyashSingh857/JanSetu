@@ -1,0 +1,6 @@
+id,text,urgency,category,source
+r001,"Street light flickering outside community hall",normal,electricity,real
+r002,"Open garbage heap attracting stray animals near school gate",urgent,sanitation,real
+r003,"Water supply low pressure since last night in sector 9",normal,water,real
+r004,"Broken footpath tiles injuring pedestrians at main square",urgent,road,real
+r005,"Mosquito breeding due to stagnant water behind hospital",urgent,health,real

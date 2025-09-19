@@ -1,0 +1,6 @@
+id,text,urgency,category
+0001,"Huge pothole causing accidents near main square",urgent,road
+0002,"Street light not working on 5th avenue",normal,electricity
+0003,"Garbage piling near market entrance",urgent,sanitation
+0004,"Water leakage from main pipe behind school",urgent,water
+0005,"Broken sidewalk tiles causing difficulty walking",normal,road
