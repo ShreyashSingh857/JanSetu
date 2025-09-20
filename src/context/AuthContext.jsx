@@ -84,9 +84,12 @@ export function AuthProvider({ children }) {
 
   const signInWithGoogle = async (user_type) => {
     if (user_type) localStorage.setItem('pendingUserType', user_type);
+    const redirectTo = import.meta.env.DEV
+      ? 'http://localhost:5173/auth/callback'
+      : 'https://jan-setu.vercel.app/auth/callback'; // change to custom domain if you add one
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` }
+      options: { redirectTo }
     });
     if (error) throw error;
   };

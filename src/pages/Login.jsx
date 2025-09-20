@@ -157,10 +157,13 @@ const Login = () => {
     try {
       // Store intended role so callback can pick it up
       localStorage.setItem('pendingUserType', loginType);
+      const redirectTo = import.meta.env.DEV
+        ? 'http://localhost:5173/auth/callback'
+        : 'https://jan-setu.vercel.app/auth/callback'; // update domain if you add custom
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo
         }
       });
       if (error) throw error;

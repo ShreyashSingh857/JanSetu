@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { FaCamera, FaVideo, FaPaperPlane, FaTimes, FaMapMarkerAlt, FaCheckCircle } from "react-icons/fa";
 import { motion } from "framer-motion";
 import NavBarCitizen from "./NavBarCitizen";
-import { issueService, storageService } from "../../services/supabaseService";
+// Removed legacy services import; using React Query mutation hook instead
+import { useCreateIssue } from "../../hooks/useCreateIssue";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,7 +13,8 @@ const IssueCard = () => {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Road Maintenance");
   const [urgency, setUrgency] = useState("Medium");
-  const [media, setMedia] = useState(null);
+  const [mediaPreview, setMediaPreview] = useState(null);
+  const [mediaFile, setMediaFile] = useState(null);
   const [mediaType, setMediaType] = useState(null);
   const [isCapturing, setIsCapturing] = useState(false);
   const [captureMode, setCaptureMode] = useState(null);
@@ -26,6 +28,8 @@ const IssueCard = () => {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const navigate = useNavigate();
+
+  const { mutateAsync: createIssue, isPending } = useCreateIssue();
 
   // Get location from localStorage when component mounts
   useEffect(() => {
@@ -86,8 +90,9 @@ const IssueCard = () => {
       
       canvas.toBlob(blob => {
         const file = new File([blob], `issue-photo-${Date.now()}.jpg`, { type: 'image/jpeg' });
-        setMedia(URL.createObjectURL(file));
-        setMediaType('image');
+  setMediaPreview(URL.createObjectURL(file));
+  setMediaFile(file);
+  setMediaType('image');
         stopCamera();
       }, 'image/jpeg', 0.8);
     }
@@ -107,7 +112,8 @@ const IssueCard = () => {
         
         canvas.toBlob(blob => {
           const file = new File([blob], `issue-video-${Date.now()}.mp4`, { type: 'video/mp4' });
-          setMedia(URL.createObjectURL(file));
+          setMediaPreview(URL.createObjectURL(file));
+          setMediaFile(file);
           setMediaType('video');
           stopCamera();
         }, 'video/mp4', 0.8);
@@ -116,8 +122,10 @@ const IssueCard = () => {
   };
 
   const removeMedia = () => {
-    setMedia(null);
-    setMediaType(null);
+  if (mediaPreview) URL.revokeObjectURL(mediaPreview);
+  setMediaPreview(null);
+  setMediaFile(null);
+  setMediaType(null);
   };
 
   const handleLocationSelect = () => {
@@ -137,36 +145,38 @@ const IssueCard = () => {
     }
     
     setUploading(true);
-    
     try {
-      // Simulate successful submission without backend connection
-      // This is for UI demonstration only
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      const files = mediaFile ? [mediaFile] : [];
+      await createIssue({
+        files,
+        title,
+        description,
+        category,
+        urgency,
+        latitude,
+        longitude
+      });
+
       // Reset form
       setTitle("");
       setDescription("");
       setCategory("Road Maintenance");
       setUrgency("Medium");
-      setMedia(null);
+      if (mediaPreview) URL.revokeObjectURL(mediaPreview);
+      setMediaPreview(null);
+      setMediaFile(null);
       setMediaType(null);
       setLocation("");
       setLatitude(null);
       setLongitude(null);
       setShowMapButton(true);
-      
-      // Show success state
+
       setSubmitted(true);
       toast.success("Issue reported successfully!");
-      
-      // Reset success state after some time
-      setTimeout(() => {
-        setSubmitted(false);
-      }, 3000);
-      
+      setTimeout(() => setSubmitted(false), 3000);
     } catch (error) {
-      console.error("Error creating issue:", error);
-      toast.error("Failed to report issue. Please try again.");
+      console.error('Error creating issue', error);
+      toast.error(error.message || 'Failed to report issue');
     } finally {
       setUploading(false);
     }
@@ -177,8 +187,10 @@ const IssueCard = () => {
     setDescription("");
     setCategory("Road Maintenance");
     setUrgency("Medium");
-    setMedia(null);
-    setMediaType(null);
+  if (mediaPreview) URL.revokeObjectURL(mediaPreview);
+  setMediaPreview(null);
+  setMediaFile(null);
+  setMediaType(null);
     setLocation("");
     setLatitude(null);
     setLongitude(null);
@@ -368,7 +380,7 @@ const IssueCard = () => {
           <div className="mb-6">
             <label className="block text-gray-700 font-medium mb-2">Add Media Evidence</label>
             
-            {!media ? (
+            {!mediaPreview ? (
               <div className="flex flex-col space-y-4">
                 {!isCapturing ? (
                   <>
@@ -434,13 +446,13 @@ const IssueCard = () => {
               <div className="relative">
                 {mediaType === 'image' ? (
                   <img 
-                    src={media} 
+                    src={mediaPreview} 
                     alt="Issue evidence" 
                     className="w-full h-64 object-cover rounded-lg"
                   />
                 ) : (
                   <video 
-                    src={media} 
+                    src={mediaPreview} 
                     controls 
                     className="w-full h-64 object-cover rounded-lg"
                   />
