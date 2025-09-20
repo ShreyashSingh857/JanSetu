@@ -3,6 +3,8 @@ import L from 'leaflet';
 import 'leaflet.heat';
 import "leaflet/dist/leaflet.css";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useIssues } from '../../hooks/useIssues';
+import { useRealtimeIssues } from '../../hooks/useRealtimeIssues';
 import NavBarCitizen from "./NavBarCitizen";
 
 // Fix for default markers in react-leaflet
@@ -13,44 +15,46 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Custom marker icons for different issue types
-const createCustomIcon = (category) => {
-  const iconUrl = getIconForCategory(category);
-  return L.icon({
-    iconUrl: iconUrl,
-    iconSize: [25, 25],
-    iconAnchor: [12, 12],
-    popupAnchor: [0, -12]
-  });
-};
+// Category icon configuration
+const CATEGORY_ICON_MAP = [
+  { keys: ['road maintenance','roads','road'], emoji: '🚧', bg: '#fff7ed', ring: '#f97316' },
+  { keys: ['sanitation','garbage','waste'], emoji: '🗑️', bg: '#f0fdf4', ring: '#16a34a' },
+  { keys: ['electricity','power','lighting','street light','light'], emoji: '⚡', bg: '#fef2f2', ring: '#dc2626' },
+  { keys: ['water supply','water','leak'], emoji: '💧', bg: '#eff6ff', ring: '#2563eb' },
+  { keys: ['public transport','transport','bus'], emoji: '🚌', bg: '#f5f3ff', ring: '#7c3aed' },
+  { keys: ['other'], emoji: '📍', bg: '#f3f4f6', ring: '#4b5563' }
+];
 
-const getIconForCategory = (category) => {
-  const icons = {
-    'Roads': '🚧',
-    'Water Supply': '💧',
-    'Electricity': '⚡',
-    'Sanitation': '🗑️',
-    'Public Transport': '🚌'
-  };
-  const emoji = icons[category] || '📍';
-  
-  // Use encodeURIComponent instead of btoa for Unicode characters
-  const svgString = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25">
-      <circle cx="12.5" cy="12.5" r="12" fill="white" stroke="black" stroke-width="1"/>
-      <text x="12.5" y="16" font-size="12" text-anchor="middle">${emoji}</text>
-    </svg>
-  `;
-  
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svgString)}`;
-};
+function resolveCategoryIcon(categoryRaw) {
+  const c = (categoryRaw || '').toLowerCase();
+  return CATEGORY_ICON_MAP.find(cfg => cfg.keys.some(k => c.includes(k))) || CATEGORY_ICON_MAP[CATEGORY_ICON_MAP.length -1];
+}
+
+function createDivIcon(category) {
+  const { emoji, bg, ring } = resolveCategoryIcon(category);
+  const html = `
+    <div style="
+      width:34px;height:34px;border-radius:50%;
+      background:${bg};
+      border:2px solid ${ring};
+      display:flex;align-items:center;justify-content:center;
+      font-size:18px;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.25));
+    ">${emoji}</div>`;
+  return L.divIcon({
+    html,
+    className: 'issue-category-icon',
+    iconSize: [34,34],
+    iconAnchor: [17,17],
+    popupAnchor: [0,-16]
+  });
+}
 
 // Marker component for individual issues
 const IssueMarker = ({ issue }) => {
   const map = useMap();
   
   const marker = useMemo(() => {
-    const icon = createCustomIcon(issue.category);
+    const icon = createDivIcon(issue.category);
     return L.marker([issue.lat, issue.lng], { icon });
   }, [issue]);
   
@@ -76,45 +80,44 @@ const IssueMarker = ({ issue }) => {
 // Heatmap layer component
 const HeatmapLayer = ({ data, intensityType }) => {
   const map = useMap();
+  const layerRef = useRef(null);
   
   useEffect(() => {
-    // Remove existing heatmap layers
-    map.eachLayer(layer => {
-      if (layer instanceof L.HeatLayer) {
-        map.removeLayer(layer);
-      }
-    });
+    // Remove previous layer instance if present
+    if (layerRef.current) {
+      map.removeLayer(layerRef.current);
+      layerRef.current = null;
+    }
 
     if (data.length === 0) return;
 
-    const heatmapPoints = data.map(issue => {
+    const rawPoints = data.map(issue => {
       let intensity;
-      
       if (intensityType === 'urgency') {
-        intensity = issue.urgency === 'Critical' ? 1.0 : 
-                   issue.urgency === 'High' ? 0.7 :
-                   issue.urgency === 'Medium' ? 0.4 : 0.2;
+        intensity = issue.urgency === 'Critical' ? 1.0 : issue.urgency === 'High' ? 0.75 : issue.urgency === 'Medium' ? 0.5 : 0.25;
       } else if (intensityType === 'status') {
-        intensity = issue.status === 'Pending' ? 0.2 :
-                   issue.status === 'In Progress' ? 0.5 : 0.8;
-      } else if (intensityType === 'points') {
-        intensity = Math.min(issue.points / 50, 1.0);
+        intensity = issue.status === 'Reported' || issue.status === 'Pending' ? 0.4 : issue.status === 'In Progress' ? 0.7 : 0.9;
+      } else {
+        // points mode
+        const base = issue.points || 0;
+        intensity = Math.min(base / 20, 1); // scale upvotes -> intensity
       }
-      
       return [issue.lat, issue.lng, intensity];
     });
 
     if (L.heatLayer) {
-      L.heatLayer(heatmapPoints, {
-        radius: 25,
-        blur: 15,
-        maxZoom: 17,
+      layerRef.current = L.heatLayer(rawPoints, {
+        radius: 32,
+        blur: 22,
+        maxZoom: 18,
+        minOpacity: 0.25,
         gradient: {
-          0.2: 'blue',
-          0.4: 'cyan',
-          0.6: 'lime',
-          0.8: 'yellow',
-          1.0: 'red'
+          0.0: '#1d4ed8',
+          0.3: '#0ea5e9',
+          0.5: '#10b981',
+          0.7: '#f59e0b',
+          0.85: '#dc2626',
+          1.0: '#7f1d1d'
         }
       }).addTo(map);
     }
@@ -228,79 +231,10 @@ const reverseGeocode = async (lat, lng) => {
   }
 };
 
-// Dummy data
-const issues = [
-  {
-    id: 1,
-    title: 'Pothole on Main Street',
-    category: 'Roads',
-    description: 'Large pothole near the intersection of Main and 5th Street',
-    status: 'In Progress',
-    date: '2023-10-15',
-    lat: 19.0760,
-    lng: 72.8777,
-    location: 'Main Street',
-    urgency: 'High',
-    image: 'https://images.unsplash.com/photo-1542222123-01f495313c87?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-    points: 25
-  },
-  {
-    id: 2,
-    title: 'Broken Street Light',
-    category: 'Electricity',
-    description: 'Street light not working on Oak Avenue',
-    status: 'Resolved',
-    date: '2023-10-10',
-    lat: 19.0860,
-    lng: 72.8877,
-    location: 'Oak Avenue',
-    urgency: 'Medium',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-    points: 20
-  },
-  {
-    id: 3,
-    title: 'Garbage Accumulation',
-    category: 'Sanitation',
-    description: 'Garbage has not been collected for 2 weeks in the downtown area',
-    status: 'Pending',
-    date: '2023-10-05',
-    lat: 19.0660,
-    lng: 72.8677,
-    location: 'Downtown',
-    urgency: 'High',
-    image: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-    points: 30
-  },
-  {
-    id: 4,
-    title: 'Water Leakage',
-    category: 'Water Supply',
-    description: 'Water leaking from a main pipe on Elm Street',
-    status: 'In Progress',
-    date: '2023-09-28',
-    lat: 19.0765,
-    lng: 72.8670,
-    location: 'Elm Street',
-    urgency: 'Critical',
-    image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-    points: 35
-  },
-  {
-    id: 5,
-    title: 'Damaged Sidewalk',
-    category: 'Roads',
-    description: 'Cracked and uneven sidewalk posing tripping hazard',
-    status: 'Pending',
-    date: '2023-10-01',
-    lat: 19.0720,
-    lng: 72.8820,
-    location: 'Park Avenue',
-    urgency: 'Medium',
-    image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-    points: 22
-  }
-];
+// Map local status mapping if needed
+const STATUS_MAP = {
+  Pending: 'Reported'
+};
 
 export default function MapView() {
   const [filters, setFilters] = useState({
@@ -308,19 +242,34 @@ export default function MapView() {
     category: 'All',
     intensity: 'urgency'
   });
+  const { data: issues = [], isLoading } = useIssues();
+  useRealtimeIssues(true);
 
   // Get unique categories from issues
-  const categories = useMemo(() => [...new Set(issues.map(issue => issue.category))], []);
+  const categories = useMemo(() => [...new Set(issues.map(issue => issue.category).filter(Boolean))], [issues]);
 
   // Filter issues based on selected filters
   const filteredIssues = useMemo(() => {
     return issues.filter(issue => {
+      const status = issue.status;
       return (
-        (filters.status === 'All' || issue.status === filters.status) &&
+        (filters.status === 'All' || status === filters.status) &&
         (filters.category === 'All' || issue.category === filters.category)
       );
-    });
-  }, [filters]);
+    }).map(i => ({
+      id: i.id,
+      title: i.title,
+      category: i.category,
+      description: i.description,
+      status: i.status,
+      date: i.created_at,
+      lat: i.latitude || i.lat || 0,
+      lng: i.longitude || i.lng || 0,
+      location: i.location || 'Unknown',
+      urgency: i.urgency || 'Medium',
+      points: i.upvote_count || 0
+    }));
+  }, [filters, issues]);
 
   // Handle double click to set location and redirect
   const handleMapDoubleClick = useCallback(async (e) => {
@@ -369,13 +318,16 @@ export default function MapView() {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         
-        <MapController issues={filteredIssues} />
+  {!isLoading && <MapController issues={filteredIssues} />}
         
         <HeatmapLayer data={filteredIssues} intensityType={filters.intensity} />
         
-        {filteredIssues.map(issue => (
+        {!isLoading && filteredIssues.map(issue => (
           <IssueMarker key={issue.id} issue={issue} />
         ))}
+        {isLoading && (
+          <div className="leaflet-top leaflet-right m-4 p-2 bg-white rounded shadow text-sm">Loading issues...</div>
+        )}
         
       </MapContainer>
       
