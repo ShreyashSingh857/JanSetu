@@ -22,6 +22,7 @@ import NavBarCitizen from "../components/Citizen/NavBarCitizen";
 import { useNavigate } from 'react-router-dom';
 import { useIssues } from "../hooks/useIssues";
 import { useToggleUpvote } from "../hooks/useToggleUpvote";
+import { useDashboardData } from "../hooks/useDashboardData";
 
 // Status colors for consistency
 const STATUS_COLORS = {
@@ -36,43 +37,22 @@ const CitizenDashboard = () => {
   const { data: issues = [], isLoading } = useIssues();
   const toggleUpvote = useToggleUpvote();
   const navigate = useNavigate();
+  const { data: dashboard, isLoading: loadingDash } = useDashboardData();
 
-  const stats = useMemo(() => {
-    const reported = issues.filter(i => i.status === 'Reported').length;
-    const inProgress = issues.filter(i => i.status === 'In Progress').length;
-    const resolved = issues.filter(i => i.status === 'Resolved').length;
-    const upvotes = issues.reduce((sum, i) => sum + (i.upvote_count || 0), 0);
-    return { reported, inProgress, resolved, upvotes };
-  }, [issues]);
-
-  // Placeholder trend data (would be computed server-side or via time-series query)
-  const trendData = useMemo(() => [
-    { day: 'Mon', reported: Math.min(stats.reported, 2), resolved: Math.min(stats.resolved, 1) },
-    { day: 'Tue', reported: 1, resolved: 0 },
-    { day: 'Wed', reported: 2, resolved: 1 },
-    { day: 'Thu', reported: 1, resolved: 1 },
-    { day: 'Fri', reported: 1, resolved: 0 },
-  ], [stats]);
+  const stats = dashboard?.stats || { reported:0, inProgress:0, resolved:0, upvotes:0 };
+  const trendData = dashboard?.weekly || [];
 
   // Filter options for issues
   const filterOptions = ["All", "MIDC", "MIDC Test", "Clandysia", "Chandysia", "Adagus"];
 
   // Calculate status distribution for pie chart
-  const statusDistribution = [
-    { name: "Reported", value: stats.reported, color: STATUS_COLORS.Reported },
-    { name: "In Progress", value: stats.inProgress, color: STATUS_COLORS["In Progress"] },
-    { name: "Resolved", value: stats.resolved, color: STATUS_COLORS.Resolved },
-  ];
+  const statusDistribution = (dashboard?.statusDistribution || []).map(item => ({
+    ...item,
+    color: STATUS_COLORS[item.name] || '#64748b'
+  }));
 
   // Radar chart data for issue categories
-  const categoryData = useMemo(() => {
-    const counts = issues.reduce((acc, i) => {
-      const key = i.category || 'Other';
-      acc[key] = (acc[key] || 0) + 1;
-      return acc;
-    }, {});
-    return Object.entries(counts).map(([subject, count]) => ({ subject, A: count, fullMark: Math.max(...Object.values(counts)) || 1 }));
-  }, [issues]);
+  const categoryData = dashboard?.categoryCounts || [];
 
   // IssueDisplayCard component
   const IssueDisplayCard = ({ issue }) => {
@@ -133,10 +113,9 @@ const CitizenDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-gray-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-gray-50 to-indigo-50 flex flex-col">
       <NavBarCitizen />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex-1 flex flex-col">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
           <div>
@@ -196,7 +175,7 @@ const CitizenDashboard = () => {
           ))}
         </motion.div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+  <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 flex-1">
           {/* Left Column - Charts */}
           <div className="xl:col-span-1 space-y-6">
             {/* Status Distribution Chart */}
@@ -270,7 +249,7 @@ const CitizenDashboard = () => {
           </div>
 
           {/* Middle Column - Issues List */}
-          <div className="xl:col-span-1">
+          <div className="xl:col-span-1 flex flex-col">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -313,15 +292,21 @@ const CitizenDashboard = () => {
               </div>
 
               {/* Issues list */}
-              <div className="p-4 flex-grow overflow-auto">
-                {isLoading && <div className="text-center py-6 text-gray-500">Loading issues...</div>}
-                {!isLoading && issues
+              <div
+                className="p-4 pt-3 flex-grow overflow-y-auto no-scrollbar"
+                style={{
+                  maxHeight: 'calc(100vh - 360px)',
+                  WebkitOverflowScrolling: 'touch'
+                }}
+              >
+                {(isLoading || loadingDash) && <div className="text-center py-6 text-gray-500">Loading issues...</div>}
+                {!isLoading && !loadingDash && issues
                   .filter((issue) => issue.status === activeTab && 
                           (selectedFilter === "All" || issue.location === selectedFilter))
                   .map((issue) => (
                     <IssueDisplayCard key={issue.id} issue={issue} />
                   ))}
-                {!isLoading && issues.filter((issue) => issue.status === activeTab && 
+                {!isLoading && !loadingDash && issues.filter((issue) => issue.status === activeTab && 
                   (selectedFilter === "All" || issue.location === selectedFilter)).length === 0 && (
                   <div className="text-center py-12 text-gray-500">
                     <div className="text-4xl mb-4">🔍</div>
@@ -334,7 +319,7 @@ const CitizenDashboard = () => {
           </div>
 
           {/* Right Column - Trends */}
-          <div className="xl:col-span-1 space-y-6">
+          <div className="xl:col-span-1 space-y-6 flex flex-col">
             {/* Trend Chart */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}

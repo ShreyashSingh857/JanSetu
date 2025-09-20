@@ -1,10 +1,15 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useIssues } from "../../hooks/useIssues";
+import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../../lib/supabase';
 import NavBarGov from "../Gov/NavBarGov";
-import { FiSearch, FiFilter, FiDownload, FiEye, FiEdit } from "react-icons/fi";
+import { FiSearch, FiFilter, FiDownload, FiEye } from "react-icons/fi";
 
 export default function ReportedIssues() {
+  const navigate = useNavigate();
+  const qc = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [sectorFilter, setSectorFilter] = useState("All");
@@ -30,6 +35,31 @@ export default function ReportedIssues() {
     issues?.forEach(i => { if (i.category) set.add(i.category); });
     return Array.from(set.values());
   }, [issues]);
+
+  function handleExport() {
+    try {
+      const lines = [];
+      lines.push('Issue ID,Category,Status,Created At');
+      filteredIssues.forEach(i => {
+        const safeCat = (i.sector || '').replace(/,/g,';');
+        lines.push(`${i.id},${safeCat},${i.status},${i.date}`);
+      });
+      const blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `reported-issues-${Date.now()}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Export failed', e);
+      alert('Failed to export');
+    }
+  }
+
+  // Editing/status advancement removed per latest requirements.
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -103,7 +133,7 @@ export default function ReportedIssues() {
               {!isLoading && !error && `Showing ${filteredIssues.length} issues`}
             </div>
             <div className="flex space-x-2">
-              <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+              <button onClick={handleExport} className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
                 <FiDownload className="text-gray-500" />
                 Export
               </button>
@@ -167,11 +197,8 @@ export default function ReportedIssues() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
-                        <button className="text-blue-600 hover:text-blue-900">
+                        <button onClick={() => navigate(`/issues/${issue.id}`)} className="text-blue-600 hover:text-blue-900" title="View details">
                           <FiEye className="w-4 h-4" />
-                        </button>
-                        <button className="text-indigo-600 hover:text-indigo-900">
-                          <FiEdit className="w-4 h-4" />
                         </button>
                       </div>
                     </td>

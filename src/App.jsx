@@ -12,6 +12,7 @@ import IssueProgress from './components/Gov/IssueProgress';
 import IssueCard from './components/Citizen/IssueCard';
 import MapView1 from './components/Citizen/MapView1';
 import Myreport from './components/Citizen/Myreport';
+import IssueDetail from './pages/IssueDetail';
 import 'leaflet/dist/leaflet.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -71,6 +72,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Myreport />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/issues/:id" 
+          element={
+            <ProtectedRoute>
+              <IssueDetail />
             </ProtectedRoute>
           } 
         />

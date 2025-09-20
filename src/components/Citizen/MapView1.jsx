@@ -271,6 +271,9 @@ export default function MapView() {
     }));
   }, [filters, issues]);
 
+  // Hide resolved issues from map/heatmap (they disappear once completed)
+  const visibleIssues = useMemo(() => filteredIssues.filter(i => i.status !== 'Resolved'), [filteredIssues]);
+
   // Handle double click to set location and redirect
   const handleMapDoubleClick = useCallback(async (e) => {
     const { lat, lng } = e.latlng;
@@ -311,18 +314,18 @@ export default function MapView() {
           categories={categories} 
         />
         
-        <MapDoubleClickHandler onDoubleClick={handleMapDoubleClick} />
+  <MapDoubleClickHandler onDoubleClick={handleMapDoubleClick} />
         
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         
-  {!isLoading && <MapController issues={filteredIssues} />}
+  {!isLoading && <MapController issues={visibleIssues} />}
         
-        <HeatmapLayer data={filteredIssues} intensityType={filters.intensity} />
+  <HeatmapLayer data={visibleIssues} intensityType={filters.intensity} />
         
-        {!isLoading && filteredIssues.map(issue => (
+        {!isLoading && visibleIssues.map(issue => (
           <IssueMarker key={issue.id} issue={issue} />
         ))}
         {isLoading && (

@@ -1,5 +1,7 @@
 import { MapContainer, TileLayer, useMap, LayersControl, Marker, Popup } from "react-leaflet";
-import { reportedIssues } from "../../data/fakeData";
+// import { reportedIssues } from "../../data/fakeData"; // replaced by live data
+import { useIssues } from '../../hooks/useIssues';
+import { useRealtimeIssues } from '../../hooks/useRealtimeIssues';
 import NavBarGov from "../Gov/NavBarGov";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import L from 'leaflet';
@@ -20,6 +22,18 @@ const encodeSvg = (svgString) => {
     .replace(/'/g, '%27')
     .replace(/"/g, '%22');
 };
+
+// Normalize raw category values into sector buckets
+function normalizeCategory(raw) {
+  if (!raw) return 'Other';
+  const c = raw.toLowerCase();
+  if (c.includes('road')) return 'Roads';
+  if (c.includes('water')) return 'Water Supply';
+  if (c.includes('electric') || c.includes('power') || c.includes('light')) return 'Electricity';
+  if (c.includes('sanit') || c.includes('garbage') || c.includes('waste')) return 'Sanitation';
+  if (c.includes('transport') || c.includes('bus')) return 'Public Transport';
+  return raw;
+}
 
 // Custom marker icons for different issue types
 const createCustomIcon = (category) => {
@@ -81,7 +95,7 @@ const IssueMarker = ({ issue }) => {
   return null;
 };
 
-// Heatmap layer component
+// Heatmap layer component (aligned with citizen map logic: urgency | status | points)
 const HeatmapLayer = ({ data, intensityType }) => {
   const map = useMap();
   
@@ -93,40 +107,32 @@ const HeatmapLayer = ({ data, intensityType }) => {
     });
 
     const heatmapPoints = data.map(issue => {
-      let intensity = 0.2;
-      
-      if (intensityType === 'status') {
-        intensity = issue.status === "Resolved" ? 0.2 : 
-                   issue.status === "In Progress" ? 0.5 : 0.8;
-      } else if (intensityType === 'urgency') {
-        intensity = issue.urgency === "Critical" ? 1.0 : 
-                   issue.urgency === "High" ? 0.7 :
-                   issue.urgency === "Medium" ? 0.4 : 0.2;
-      } else if (intensityType === 'sector') {
-        const sectorIntensities = {
-          'Roads': 0.8,
-          'Water Supply': 0.6,
-          'Electricity': 0.7,
-          'Sanitation': 0.9,
-          'Public Transport': 0.5
-        };
-        intensity = sectorIntensities[issue.sector] || 0.3;
+      let intensity;
+      if (intensityType === 'urgency') {
+        intensity = issue.urgency === 'Critical' ? 1.0 : issue.urgency === 'High' ? 0.75 : issue.urgency === 'Medium' ? 0.5 : 0.25;
+      } else if (intensityType === 'status') {
+        intensity = (issue.status === 'Reported' || issue.status === 'Pending') ? 0.4 : issue.status === 'In Progress' ? 0.7 : 0.9;
+      } else { // points (upvotes)
+        const base = issue.points || 0;
+        intensity = Math.min(base / 20, 1);
+        if (intensity === 0) intensity = 0.15; // faint visibility for zero-upvote items
       }
-      
       return [issue.lat, issue.lng, intensity];
     });
 
     if (window.L && window.L.heatLayer) {
       const heatmap = L.heatLayer(heatmapPoints, {
-        radius: 30,
-        blur: 20,
-        maxZoom: 16,
+        radius: 32,
+        blur: 22,
+        maxZoom: 18,
+        minOpacity: 0.25,
         gradient: {
-          0.2: 'blue',
-          0.4: 'cyan',
-          0.6: 'lime',
-          0.8: 'yellow',
-          1.0: 'red'
+          0.0: '#1d4ed8',
+          0.3: '#0ea5e9',
+          0.5: '#10b981',
+          0.7: '#f59e0b',
+          0.85: '#dc2626',
+          1.0: '#7f1d1d'
         }
       }).addTo(map);
       
@@ -172,15 +178,15 @@ const MapFilters = ({ filters, setFilters, categories }) => {
         <div className="p-4 max-w-xs">
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Heatmap Type:</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Heatmap Intensity:</label>
               <select 
                 value={filters.intensity} 
                 onChange={(e) => setFilters({...filters, intensity: e.target.value})}
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="status">By Status</option>
                 <option value="urgency">By Urgency</option>
-                <option value="sector">By Sector</option>
+                <option value="status">By Status</option>
+                <option value="points">By Upvotes</option>
               </select>
             </div>
             <div>
@@ -221,22 +227,24 @@ const MapLegend = ({ intensityType }) => {
   const getLegendItems = () => {
     if (intensityType === 'status') {
       return [
-        { color: 'red', label: 'Pending Issues' },
-        { color: 'yellow', label: 'In Progress' },
-        { color: 'blue', label: 'Resolved' }
+        { color: '#1d4ed8', label: 'Reported/Pending' },
+        { color: '#f59e0b', label: 'In Progress' },
+        { color: '#dc2626', label: 'Resolved' }
       ];
     } else if (intensityType === 'urgency') {
       return [
-        { color: 'red', label: 'Critical' },
-        { color: 'yellow', label: 'High' },
-        { color: 'lime', label: 'Medium' },
-        { color: 'blue', label: 'Low' }
+        { color: '#dc2626', label: 'Critical' },
+        { color: '#f59e0b', label: 'High' },
+        { color: '#10b981', label: 'Medium' },
+        { color: '#0ea5e9', label: 'Low' }
       ];
-    } else {
+    } else { // points
       return [
-        { color: 'red', label: 'High Priority Sectors' },
-        { color: 'yellow', label: 'Medium Priority' },
-        { color: 'blue', label: 'Low Priority' }
+        { color: '#7f1d1d', label: 'Very High Upvotes' },
+        { color: '#dc2626', label: 'High' },
+        { color: '#f59e0b', label: 'Moderate' },
+        { color: '#10b981', label: 'Low' },
+        { color: '#1d4ed8', label: 'Few / None' }
       ];
     }
   };
@@ -308,20 +316,40 @@ export default function MapView() {
     }
   };
 
-  const sectors = useMemo(() => [...new Set(reportedIssues.map(issue => issue.sector))], []);
+  const { data: liveIssues = [], isLoading } = useIssues();
+  useRealtimeIssues(true);
+
+  // Adapt live issues to expected shape (lat/lng fields may be latitude/longitude)
+  const adaptedIssues = useMemo(() => {
+    return liveIssues.map(i => ({
+      id: i.id,
+      sector: normalizeCategory(i.category),
+      description: i.description,
+      status: i.status,
+      urgency: i.urgency || 'Medium',
+      points: i.upvote_count || 0,
+      lat: i.latitude || i.lat || 0,
+      lng: i.longitude || i.lng || 0
+    })).filter(i => i.lat && i.lng);
+  }, [liveIssues]);
+
+  const sectors = useMemo(() => [...new Set(adaptedIssues.map(issue => issue.sector))], [adaptedIssues]);
 
   const filteredIssues = useMemo(() => {
-    return reportedIssues.filter(issue => {
+    return adaptedIssues.filter(issue => {
       const statusMatch = filters.status === "All" || issue.status === filters.status;
       const sectorMatch = filters.sector === "All" || issue.sector === filters.sector;
       return statusMatch && sectorMatch;
     });
-  }, [filters]);
+  }, [filters, adaptedIssues]);
+
+  // Resolved issues should disappear from map/heatmap (unless explicitly needed later)
+  const visibleIssues = useMemo(() => filteredIssues.filter(i => i.status !== 'Resolved'), [filteredIssues]);
 
   const stats = useMemo(() => {
     return {
       total: filteredIssues.length,
-      pending: filteredIssues.filter(issue => issue.status === "Pending").length,
+      pending: filteredIssues.filter(issue => issue.status === "Pending" || issue.status === 'Reported').length,
       inProgress: filteredIssues.filter(issue => issue.status === "In Progress").length,
       resolved: filteredIssues.filter(issue => issue.status === "Resolved").length,
     };
@@ -387,9 +415,9 @@ export default function MapView() {
             </LayersControl.BaseLayer>
           </LayersControl>
           
-          <HeatmapLayer data={filteredIssues} intensityType={filters.intensity} />
+          {!isLoading && <HeatmapLayer data={visibleIssues} intensityType={filters.intensity} />}
           
-          {filteredIssues.map(issue => (
+          {!isLoading && visibleIssues.map(issue => (
             <IssueMarker key={issue.id} issue={issue} />
           ))}
           
@@ -407,6 +435,9 @@ export default function MapView() {
             >
               <Popup>Your Location</Popup>
             </Marker>
+          )}
+          {isLoading && (
+            <div className="leaflet-top leaflet-right m-4 p-2 bg-white rounded shadow text-sm">Loading issues...</div>
           )}
         </MapContainer>
         

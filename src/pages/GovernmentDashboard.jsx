@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { useMemo } from "react";
 import NavBarGov from "../components/Gov/NavBarGov";
 import {
   Chart as ChartJS,
@@ -14,6 +13,7 @@ import {
   ArcElement,
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
+import { useGovDashboard } from '../hooks/useGovDashboard';
 
 // Register Chart.js components
 ChartJS.register(
@@ -29,92 +29,13 @@ ChartJS.register(
 );
 
 export default function GovernmentDashboard() {
-  const [sectors, setSectors] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [timeFilter, setTimeFilter] = useState('30d');
-  const [priorityIssues, setPriorityIssues] = useState([]);
-  const [trendData, setTrendData] = useState(null);
-  const [comparisonData, setComparisonData] = useState(null);
+  const { data, isLoading, isError, error } = useGovDashboard();
+  const sectors = data?.sectors || [];
+  const priorityIssues = data?.priorityIssues || [];
+  const trendData = data?.trend || null;
+  const comparisonData = data?.comparison || null;
 
-  useEffect(() => {
-    // Simulate API fetch
-    const fetchData = async () => {
-      try {
-        // In a real app, you would fetch from your API
-        const sectorData = [
-          { name: "Roads", shortName: "Roads", issues: 120, resolved: 80 },
-          { name: "Water Supply", shortName: "Water", issues: 90, resolved: 70 },
-          { name: "Electricity", shortName: "Electric", issues: 75, resolved: 60 },
-          { name: "Sanitation", shortName: "Sanit.", issues: 110, resolved: 95 },
-          { name: "Public Transport", shortName: "Transport", issues: 65, resolved: 50 },
-        ];
-        
-        setSectors(sectorData);
-        
-        // Simulate priority issues
-        setPriorityIssues([
-          { id: 1, title: "Major water pipeline leak", sector: "Water Supply", daysOpen: 5 },
-          { id: 2, title: "Bridge structural damage", sector: "Roads", daysOpen: 3 },
-          { id: 3, title: "Power outage in downtown area", sector: "Electricity", daysOpen: 2 },
-        ]);
-
-        // Prepare trend data
-        setTrendData({
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-          datasets: [
-            {
-              label: 'Reported Issues',
-              data: [380, 420, 395, 460, 435, 410, 460],
-              borderColor: 'rgba(52, 152, 219, 1)',
-              backgroundColor: 'rgba(52, 152, 219, 0.1)',
-              tension: 0.3,
-              fill: true,
-              borderWidth: 2
-            },
-            {
-              label: 'Resolved Issues',
-              data: [290, 320, 310, 355, 340, 330, 355],
-              borderColor: 'rgba(46, 204, 113, 1)',
-              backgroundColor: 'rgba(46, 204, 113, 0.1)',
-              tension: 0.3,
-              fill: true,
-              borderWidth: 2
-            }
-          ]
-        });
-
-        // Prepare comparison data
-        setComparisonData({
-          labels: sectorData.map(s => s.name),
-          datasets: [
-            {
-              label: 'Reported Issues',
-              data: sectorData.map(s => s.issues),
-              backgroundColor: 'rgba(52, 152, 219, 0.7)',
-              borderColor: 'rgba(52, 152, 219, 1)',
-              borderWidth: 1
-            },
-            {
-              label: 'Resolved Issues',
-              data: sectorData.map(s => s.resolved),
-              backgroundColor: 'rgba(46, 204, 113, 0.7)',
-              borderColor: 'rgba(46, 204, 113, 1)',
-              borderWidth: 1
-            }
-          ]
-        });
-
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-r from-blue-100 to-blue-200 flex items-center justify-center">
         <div className="text-center">
@@ -124,13 +45,23 @@ export default function GovernmentDashboard() {
       </div>
     );
   }
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-r from-blue-100 to-blue-200 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 font-semibold mb-2">Failed to load data</p>
+          <p className="text-sm text-gray-700">{error?.message}</p>
+        </div>
+      </div>
+    );
+  }
 
   const totalIssues = sectors.reduce((sum, sector) => sum + sector.issues, 0);
   const totalResolved = sectors.reduce((sum, sector) => sum + sector.resolved, 0);
-  const overallResolutionRate = Math.round((totalResolved / totalIssues) * 100);
+  const overallResolutionRate = totalIssues ? Math.round((totalResolved / totalIssues) * 100) : 0;
   
   const roadsSector = sectors.find(s => s.name === "Roads") || {issues: 0, resolved: 0};
-  const roadsResolutionRate = Math.round((roadsSector.resolved / roadsSector.issues) * 100);
+  const roadsResolutionRate = roadsSector.issues ? Math.round((roadsSector.resolved / roadsSector.issues) * 100) : 0;
 
   // Chart options
   const trendOptions = {
@@ -179,6 +110,46 @@ export default function GovernmentDashboard() {
     }
   };
 
+  function handleExport() {
+    try {
+      const lines = [];
+      lines.push('Government Dashboard Report');
+      lines.push(`Generated At,${new Date().toISOString()}`);
+      lines.push('');
+      lines.push('Totals');
+      lines.push(`Total Issues,${totalIssues}`);
+      lines.push(`Total Resolved,${totalResolved}`);
+      lines.push(`Resolution Rate (%),${overallResolutionRate}`);
+      lines.push('');
+      lines.push('Sectors');
+      lines.push('Sector,Reported,Resolved,ResolutionRate%');
+      sectors.forEach(s => {
+        const rr = s.issues ? Math.round((s.resolved / s.issues) * 100) : 0;
+        lines.push(`${s.name.replace(/,/g,';')},${s.issues},${s.resolved},${rr}`);
+      });
+      lines.push('');
+      lines.push('Priority Issues (Oldest Open)');
+      lines.push('ID,Title,Sector,DaysOpen');
+      priorityIssues.forEach(p => {
+        const safeTitle = (p.title || '').replace(/\n/g,' ').replace(/,/g,';');
+        lines.push(`${p.id},${safeTitle},${p.sector.replace(/,/g,';')},${p.daysOpen}`);
+      });
+      const csv = lines.join('\r\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `gov-dashboard-report-${Date.now()}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Export failed', e);
+      alert('Failed to export report');
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-100 to-blue-200">
       <NavBarGov />
@@ -189,11 +160,8 @@ export default function GovernmentDashboard() {
             <p className="text-blue-200 mt-2">Comprehensive overview of citizen reports and service resolution metrics</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
-            <button className="bg-blue-700 bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-full flex items-center gap-2 transition-all">
+            <button onClick={handleExport} className="bg-blue-700 bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-full flex items-center gap-2 transition-all">
               <i className="fas fa-download"></i> Export Report
-            </button>
-            <button className="bg-blue-700 bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-full flex items-center gap-2 transition-all">
-              <i className="fas fa-cog"></i> Settings
             </button>
           </div>
         </header>

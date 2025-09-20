@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { ensureProfileFromAuthUser } from '../services/profile';
 
 const AuthContext = createContext(undefined);
 export function useAuth() { return useContext(AuthContext); }
@@ -54,21 +55,9 @@ export function AuthProvider({ children }) {
   }, []);
 
   const ensureProfile = async (u, forcedRole) => {
+    // Reuse new helper (which reads auth user internally) but pass desired role.
     if (!u) return;
-    // Attempt to fetch profile
-    const { data, error } = await supabase.from('users').select('id, user_type').eq('id', u.id).single();
-    if (error && error.code !== 'PGRST116') {
-      console.warn('Profile fetch error', error); return;
-    }
-    if (!data) {
-      // Insert row (trigger might already handle it, but idempotent)
-      const role = forcedRole || 'citizen';
-      const { error: insErr } = await supabase.from('users').insert({ id: u.id, email: u.email, full_name: u.user_metadata?.full_name || u.user_metadata?.name, user_type: role });
-      if (insErr && insErr.code !== '23505') console.warn('Profile insert error', insErr);
-    } else if (forcedRole && data.user_type !== forcedRole) {
-      // Do not auto-escalate; just warn
-      console.log('Existing role differs; leaving as is.');
-    }
+    await ensureProfileFromAuthUser(forcedRole);
   };
 
   const signUp = async ({ email, password, user_type='citizen', full_name }) => {

@@ -1,17 +1,23 @@
 import { FiSearch, FiCalendar, FiAlertCircle, FiCheckCircle, FiClock, FiMapPin } from 'react-icons/fi';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import NavBarCitizen from './NavBarCitizen';
+import { useNavigate } from 'react-router-dom';
 import { useIssues } from '../../hooks/useIssues';
 import { supabase } from '../../lib/supabase';
 
 const MyReports = () => {
   const [filters, setFilters] = useState({ status: 'All', category: 'All', sortBy: 'date-desc' });
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [currentUserId, setCurrentUserId] = useState(null);
 
   // Fetch current user id (once)
-  useState(() => {
-    supabase.auth.getUser().then(({ data }) => setCurrentUserId(data?.user?.id || null));
+  useEffect(() => {
+    let active = true;
+    supabase.auth.getUser().then(({ data }) => {
+      if (active) setCurrentUserId(data?.user?.id || null);
+    });
+    return () => { active = false; };
   }, []);
 
   const { data: issues = [], isLoading, error } = useIssues({
@@ -21,18 +27,33 @@ const MyReports = () => {
     reportedBy: currentUserId || undefined
   });
 
-  const filteredReports = (issues || []).map(i => ({
-    id: i.id,
-    title: i.title,
-    category: i.category,
-    description: i.description,
-    status: i.status,
-    date: i.created_at,
-    location: i.location || '—',
-    urgency: i.urgency || 'Medium',
-    image: i.media?.[0]?.url,
-    points: 0,
-  })).sort((a, b) => {
+  const filteredReports = (issues || []).map(i => {
+    // media may be stored as JSON array (object) or stringified JSON depending on insertion path
+    let firstMediaUrl = undefined;
+    if (Array.isArray(i.media) && i.media.length) {
+      firstMediaUrl = i.media[0]?.url;
+    } else if (typeof i.media === 'string') {
+      try {
+        const parsed = JSON.parse(i.media);
+        if (Array.isArray(parsed) && parsed.length) firstMediaUrl = parsed[0]?.url;
+      } catch (_) {
+        // ignore parse error
+      }
+    }
+    return {
+      id: i.id,
+      title: i.title,
+      category: i.category,
+      description: i.description,
+      status: i.status === 'Reported' ? 'Pending' : i.status, // map if needed for legacy labels
+      date: i.created_at,
+      location: i.location || '—',
+      urgency: i.urgency || 'Medium',
+      image: firstMediaUrl,
+      points: 0,
+      mediaType: Array.isArray(i.media) ? i.media[0]?.type : undefined
+    };
+  }).sort((a, b) => {
     if (filters.sortBy === 'date-desc') return new Date(b.date) - new Date(a.date);
     if (filters.sortBy === 'date-asc') return new Date(a.date) - new Date(b.date);
     if (filters.sortBy === 'urgency') {
@@ -183,12 +204,22 @@ const MyReports = () => {
                 <li key={report.id} className="p-6 hover:bg-gray-50 transition-colors duration-150">
                   <div className="flex flex-col md:flex-row md:items-start">
                     <div className="flex-shrink-0 mb-4 md:mb-0 md:mr-6">
-                      <div className="w-32 h-24 rounded-md overflow-hidden">
-                        <img 
-                          src={report.image} 
-                          alt={report.title}
-                          className="w-full h-full object-cover"
-                        />
+                      <div className="w-32 h-24 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center text-xs text-gray-500">
+                        {report.image ? (
+                          report.mediaType === 'video' ? (
+                            <video src={report.image} className="w-full h-full object-cover" muted playsInline />
+                          ) : (
+                            <img
+                              src={report.image}
+                              alt={report.title}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                            />
+                          )
+                        ) : (
+                          'No media'
+                        )}
                       </div>
                     </div>
                     
@@ -235,12 +266,20 @@ const MyReports = () => {
                       </div>
                       
                       <div className="mt-4 flex space-x-2">
-                        <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                        <button
+                          onClick={() => navigate(`/issues/${report.id}`)}
+                          className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                        >
                           View Details
                         </button>
-                        <button className="text-sm text-gray-600 hover:text-gray-800 font-medium">
-                          Edit
-                        </button>
+                        {report.status === 'Pending' && (
+                          <button
+                            onClick={() => navigate(`/issues/${report.id}?edit=1`)}
+                            className="text-sm text-gray-600 hover:text-gray-800 font-medium"
+                          >
+                            Edit
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
