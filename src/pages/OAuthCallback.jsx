@@ -19,6 +19,7 @@ export default function OAuthCallback() {
         }
 
         const supaUser = session.user;
+          console.log('[OAuthCallback] Session user id:', supaUser.id, 'email:', supaUser.email, 'metadata:', supaUser.user_metadata);
         const storedType = localStorage.getItem('pendingUserType');
         const intendedType = storedType || supaUser.user_metadata?.user_type || 'citizen';
         const existingType = supaUser.user_metadata?.user_type;
@@ -47,11 +48,13 @@ export default function OAuthCallback() {
 
         if (fetchErr && fetchErr.code === 'PGRST116') {
           // Insert
+            console.log('[OAuthCallback] Existing user row:', existing, 'fetchErr:', fetchErr);
             const fullName = supaUser.user_metadata.full_name || supaUser.user_metadata.name || supaUser.email?.split('@')[0];
             const { error: insertErr } = await supabase.from('users').insert([
               { id: supaUser.id, email: supaUser.email, full_name: fullName, user_type: userType }
             ]);
             if (insertErr) console.error('User insert error', insertErr);
+            console.log('[OAuthCallback] Inserting new user row with type:', userType);
         }
 
         // Store local login markers

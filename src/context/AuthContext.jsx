@@ -84,9 +84,15 @@ export function AuthProvider({ children }) {
 
   const signInWithGoogle = async (user_type) => {
     if (user_type) localStorage.setItem('pendingUserType', user_type);
-    const redirectTo = import.meta.env.DEV
+    let redirectTo = import.meta.env.DEV
       ? 'http://localhost:5173/auth/callback'
-      : 'https://jan-setu.vercel.app/auth/callback'; // change to custom domain if you add one
+      : 'https://jan-setu.vercel.app/auth/callback'; // update if custom domain
+
+    // Defensive: if some environment rewrites origin to localhost:3000 in prod, force prod domain
+    if (!import.meta.env.DEV && redirectTo.includes('localhost:3000')) {
+      redirectTo = 'https://jan-setu.vercel.app/auth/callback';
+    }
+    console.log('[GoogleOAuth] Using redirectTo:', redirectTo);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo }
