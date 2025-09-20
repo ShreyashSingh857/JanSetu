@@ -19,6 +19,7 @@ import {
   PolarRadiusAxis
 } from "recharts";
 import NavBarCitizen from "../components/Citizen/NavBarCitizen";
+import { useNavigate } from 'react-router-dom';
 import { useIssues } from "../hooks/useIssues";
 import { useToggleUpvote } from "../hooks/useToggleUpvote";
 
@@ -34,6 +35,7 @@ const CitizenDashboard = () => {
   const [selectedFilter, setSelectedFilter] = useState("All");
   const { data: issues = [], isLoading } = useIssues();
   const toggleUpvote = useToggleUpvote();
+  const navigate = useNavigate();
 
   const stats = useMemo(() => {
     const reported = issues.filter(i => i.status === 'Reported').length;
@@ -148,7 +150,11 @@ const CitizenDashboard = () => {
             </motion.h1>
             <p className="text-gray-600 mt-2">Monitor and track reported community issues in real-time</p>
           </div>
-          <button className="mt-4 md:mt-0 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center">
+          <button
+            onClick={() => navigate('/issuecard')}
+            className="mt-4 md:mt-0 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center"
+            aria-label="Report a new issue"
+          >
             <span className="mr-2">+</span> Report New Issue
           </button>
         </div>
@@ -376,11 +382,19 @@ const CitizenDashboard = () => {
             >
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
               <div className="grid grid-cols-2 gap-3">
-                <button className="flex flex-col items-center justify-center p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors">
+                <button
+                  onClick={() => navigate('/issuecard')}
+                  className="flex flex-col items-center justify-center p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors"
+                  aria-label="Report Issue"
+                >
                   <span className="text-2xl mb-2">📝</span>
                   <span className="text-sm font-medium">Report Issue</span>
                 </button>
-                <button className="flex flex-col items-center justify-center p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors">
+                <button
+                  onClick={() => navigate('/map')}
+                  className="flex flex-col items-center justify-center p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors"
+                  aria-label="View Map"
+                >
                   <span className="text-2xl mb-2">🗺️</span>
                   <span className="text-sm font-medium">View Map</span>
                 </button>
