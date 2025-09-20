@@ -2,6 +2,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
+import OAuthCallback from './pages/OAuthCallback';
 import Home from './pages/Home';
 import CitizenDashboard from './pages/CitizenDashboard';
 import GovernmentDashboard from './pages/GovernmentDashboard';
@@ -13,7 +14,6 @@ import MapView1 from './components/Citizen/MapView1';
 import Myreport from './components/Citizen/Myreport';
 import 'leaflet/dist/leaflet.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import OAuthCallback from './pages/OAuthCallback';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Protected Route component using Supabase auth context

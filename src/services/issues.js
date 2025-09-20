@@ -1,50 +1,18 @@
-import { supabase } from '../lib/supabase'
+// In-memory issue service (Supabase removed)
+let _issues = [];
 
 export async function listIssues({ status, category, search, reportedBy, assignedTo, from = 0, to = 24 }) {
-  let q = supabase.from('issues').select('*').order('created_at', { ascending: false }).range(from, to)
-  if (status && status !== 'All') q = q.eq('status', status)
-  if (category && category !== 'All') q = q.eq('category', category)
-  if (search) q = q.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
-  if (reportedBy) q = q.eq('reported_by', reportedBy)
-  if (assignedTo) q = q.eq('assigned_to', assignedTo)
-  const { data, error } = await q
-  if (error) throw error
-  return data
+  let data = [..._issues];
+  if (status && status !== 'All') data = data.filter(i=>i.status===status);
+  if (category && category !== 'All') data = data.filter(i=>i.category===category);
+  if (search) data = data.filter(i=> (i.title||'').toLowerCase().includes(search.toLowerCase()) || (i.description||'').toLowerCase().includes(search.toLowerCase()));
+  if (reportedBy) data = data.filter(i=>i.reported_by===reportedBy);
+  if (assignedTo) data = data.filter(i=>i.assigned_to===assignedTo);
+  data.sort((a,b)=> new Date(b.created_at)-new Date(a.created_at));
+  return data.slice(from, to+1);
 }
-
-export async function getIssue(id) {
-  const { data, error } = await supabase.from('issues').select('*').eq('id', id).single()
-  if (error) throw error
-  return data
-}
-
-export async function createIssue(payload) {
-  const { data, error } = await supabase.from('issues').insert([payload]).select().single()
-  if (error) throw error
-  return data
-}
-
-export async function updateIssue(id, updates) {
-  const { data, error } = await supabase.from('issues').update(updates).eq('id', id).select().single()
-  if (error) throw error
-  return data
-}
-
-export async function toggleUpvote(issueId) {
-  const { error } = await supabase.rpc('toggle_upvote', { issue_uuid: issueId })
-  if (error) throw error
-}
-
-// Upload media first, then create issue referencing media array
-export async function createIssueWithMedia({ files = [], issueData }) {
-  const media = []
-  for (const file of files) {
-    const ext = file.name.split('.').pop()
-    const path = `${crypto.randomUUID()}.${ext}`
-    const { error: upErr } = await supabase.storage.from('issue-media').upload(path, file)
-    if (upErr) throw upErr
-    const { data: { publicUrl } } = supabase.storage.from('issue-media').getPublicUrl(path)
-    media.push({ type: file.type.startsWith('video') ? 'video':'image', url: publicUrl, path })
-  }
-  return createIssue({ ...issueData, media })
-}
+export async function getIssue(id){ return _issues.find(i=>i.id===id)||null; }
+export async function createIssue(payload){ const issue={ id:'issue-'+Date.now(), created_at:new Date().toISOString(), upvotes:0, media:[], ...payload}; _issues.push(issue); return issue; }
+export async function updateIssue(id, updates){ const idx=_issues.findIndex(i=>i.id===id); if(idx>-1){ _issues[idx]={..._issues[idx],...updates}; return _issues[idx]; } return null; }
+export async function toggleUpvote(issueId){ const issue=_issues.find(i=>i.id===issueId); if(issue){ issue.upvotes=(issue.upvotes||0)+1; } }
+export async function createIssueWithMedia({ files = [], issueData }) { return createIssue({ ...issueData, media: [] }); }

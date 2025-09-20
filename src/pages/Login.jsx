@@ -10,7 +10,7 @@ import {
   FaShieldAlt
 } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
 import logo from '../assets/jansetunew.png';
 
 const Login = () => {
@@ -26,6 +26,7 @@ const Login = () => {
   });
   const [isSignUp, setIsSignUp] = useState(false);
   const [fullName, setFullName] = useState('');
+  const { signInWithPassword, signUp, signInWithGoogle, loading: authLoading, user } = useAuth();
 
   const showNotification = (message, type = 'success') => {
     setNotification({ message, visible: true, type });
@@ -52,83 +53,13 @@ const Login = () => {
     
     try {
       if (isSignUp) {
-        // Sign up with email and password
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              user_type: loginType,
-              full_name: fullName
-            }
-          }
-        });
-
-        if (error) throw error;
-        
-        showNotification('Account created successfully! Please check your email for verification.');
-        setIsSignUp(false);
-        setPassword('');
-        setFullName('');
+        await signUp({ email, password, user_type: loginType, full_name: fullName });
+        showNotification('Account created. Check email for confirmation (if enabled).');
+        setIsSignUp(false); setPassword(''); setFullName('');
       } else {
-        // Sign in with email and password
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (error) throw error;
-
-        if (data.user) {
-          // If user already has a stored user_type in metadata, enforce it
-          const metaType = data.user.user_metadata?.user_type;
-          if (metaType && metaType !== loginType) {
-            showNotification(`Account registered as ${metaType}. Please choose the correct role.`, 'error');
-            // Immediately sign out this session attempt
-            await supabase.auth.signOut();
-            setLoading(false);
-            return;
-          }
-          // Check if user exists in our users table, if not create them
-          const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', data.user.id)
-            .single();
-
-          if (userError && userError.code === 'PGRST116') {
-            // User doesn't exist, create new user
-            const userMetadata = data.user.user_metadata;
-            const { error: insertError } = await supabase
-              .from('users')
-              .insert([
-                {
-                  id: data.user.id,
-                  email: email,
-                  user_type: userMetadata.user_type || loginType,
-                  full_name: userMetadata.full_name || `${loginType.charAt(0).toUpperCase() + loginType.slice(1)} User`,
-                  created_at: new Date().toISOString()
-                }
-              ]);
-
-            if (insertError) {
-              console.error('Error creating user:', insertError);
-            }
-          }
-
-          showNotification('Login successful! Redirecting...');
-          
-          // Store user info in localStorage
-          localStorage.setItem('isLoggedIn', 'true');
-          localStorage.setItem('userType', loginType);
-          localStorage.setItem('email', email);
-          localStorage.setItem('userId', data.user.id);
-          
-          // Redirect based on user type
-          setTimeout(() => {
-            window.location.href = loginType === 'citizen' ? '/citizen' : '/government';
-          }, 1500);
-        }
+        await signInWithPassword(email, password, loginType);
+        showNotification('Login successful! Redirecting...');
+        setTimeout(() => { window.location.href = loginType === 'citizen' ? '/citizen' : '/government'; }, 900);
       }
     } catch (error) {
       console.error('Authentication error:', error);
@@ -155,18 +86,8 @@ const Login = () => {
       return;
     }
     try {
-      // Store intended role so callback can pick it up
-      localStorage.setItem('pendingUserType', loginType);
-      const redirectTo = import.meta.env.DEV
-        ? 'http://localhost:5173/auth/callback'
-        : 'https://jan-setu.vercel.app/auth/callback'; // update domain if you add custom
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo
-        }
-      });
-      if (error) throw error;
+      await signInWithGoogle(loginType);
+      showNotification('Redirecting to Google...');
     } catch (e) {
       console.error('Google sign-in error', e);
       showNotification(e.message || 'Google sign-in failed', 'error');
@@ -390,12 +311,12 @@ const Login = () => {
                     
                     <motion.button 
                       type="submit"
-                      disabled={loading}
+                      disabled={loading || authLoading}
                       whileHover={{ scale: loading ? 1 : 1.02 }}
                       whileTap={{ scale: loading ? 1 : 0.98 }}
                       className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed mb-4"
                     >
-                      {loading ? (
+                      {loading || authLoading ? (
                         <>
                           <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                           {isSignUp ? 'Creating Account...' : 'Logging in...'}
