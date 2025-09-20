@@ -1,89 +1,46 @@
-import { 
-  FiSearch, FiCalendar, FiAlertCircle, 
-  FiCheckCircle, FiClock, FiMapPin
-} from 'react-icons/fi';
+import { FiSearch, FiCalendar, FiAlertCircle, FiCheckCircle, FiClock, FiMapPin } from 'react-icons/fi';
 import { useState } from 'react';
 import NavBarCitizen from './NavBarCitizen';
+import { useIssues } from '../../hooks/useIssues';
+import { supabase } from '../../lib/supabase';
 
 const MyReports = () => {
-  // Sample data for demonstration
-  const [reports, setReports] = useState([
-    {
-      id: 1,
-      title: 'Pothole on Main Street',
-      category: 'Roads',
-      description: 'Large pothole near the intersection of Main and 5th Street',
-      status: 'In Progress',
-      date: '2023-10-15',
-      location: 'Main Street',
-      urgency: 'High',
-      image: 'https://images.unsplash.com/photo-1542222123-01f495313c87?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-      points: 25
-    },
-    {
-      id: 2,
-      title: 'Broken Street Light',
-      category: 'Electricity',
-      description: 'Street light not working on Oak Avenue',
-      status: 'Resolved',
-      date: '2023-10-10',
-      location: 'Oak Avenue',
-      urgency: 'Medium',
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-      points: 20
-    },
-    {
-      id: 3,
-      title: 'Garbage Accumulation',
-      category: 'Sanitation',
-      description: 'Garbage has not been collected for 2 weeks in the downtown area',
-      status: 'Pending',
-      date: '2023-10-05',
-      location: 'Downtown',
-      urgency: 'High',
-      image: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-      points: 30
-    },
-    {
-      id: 4,
-      title: 'Water Leakage',
-      category: 'Water Supply',
-      description: 'Water leaking from a main pipe on Elm Street',
-      status: 'In Progress',
-      date: '2023-09-28',
-      location: 'Elm Street',
-      urgency: 'Critical',
-      image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-      points: 35
-    }
-  ]);
+  const [filters, setFilters] = useState({ status: 'All', category: 'All', sortBy: 'date-desc' });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentUserId, setCurrentUserId] = useState(null);
 
-  const [filters, setFilters] = useState({
-    status: 'All',
-    category: 'All',
-    sortBy: 'date-desc'
+  // Fetch current user id (once)
+  useState(() => {
+    supabase.auth.getUser().then(({ data }) => setCurrentUserId(data?.user?.id || null));
+  }, []);
+
+  const { data: issues = [], isLoading, error } = useIssues({
+    status: filters.status === 'All' ? undefined : filters.status,
+    category: filters.category === 'All' ? undefined : filters.category,
+    search: searchQuery || undefined,
+    reportedBy: currentUserId || undefined
   });
 
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // Filter and sort reports based on user selection
-  const filteredReports = reports
-    .filter(report => {
-      const matchesStatus = filters.status === 'All' || report.status === filters.status;
-      const matchesCategory = filters.category === 'All' || report.category === filters.category;
-      const matchesSearch = report.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                           report.description.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesStatus && matchesCategory && matchesSearch;
-    })
-    .sort((a, b) => {
-      if (filters.sortBy === 'date-desc') return new Date(b.date) - new Date(a.date);
-      if (filters.sortBy === 'date-asc') return new Date(a.date) - new Date(b.date);
-      if (filters.sortBy === 'urgency') {
-        const urgencyOrder = { 'Critical': 4, 'High': 3, 'Medium': 2, 'Low': 1 };
-        return urgencyOrder[b.urgency] - urgencyOrder[a.urgency];
-      }
-      return 0;
-    });
+  const filteredReports = (issues || []).map(i => ({
+    id: i.id,
+    title: i.title,
+    category: i.category,
+    description: i.description,
+    status: i.status,
+    date: i.created_at,
+    location: i.location || '—',
+    urgency: i.urgency || 'Medium',
+    image: i.media?.[0]?.url,
+    points: 0,
+  })).sort((a, b) => {
+    if (filters.sortBy === 'date-desc') return new Date(b.date) - new Date(a.date);
+    if (filters.sortBy === 'date-asc') return new Date(a.date) - new Date(b.date);
+    if (filters.sortBy === 'urgency') {
+      const urgencyOrder = { Critical: 4, High: 3, Medium: 2, Low: 1 };
+      return (urgencyOrder[b.urgency] || 0) - (urgencyOrder[a.urgency] || 0);
+    }
+    return 0;
+  });
 
   const statusIcons = {
     'Pending': <FiClock className="text-yellow-500" />,
@@ -179,7 +136,7 @@ const MyReports = () => {
             </div>
             <div>
               <p className="text-sm text-gray-600">Total Reports</p>
-              <p className="text-2xl font-bold text-gray-800">{reports.length}</p>
+              <p className="text-2xl font-bold text-gray-800">{issues.length}</p>
             </div>
           </div>
           
@@ -190,7 +147,7 @@ const MyReports = () => {
             <div>
               <p className="text-sm text-gray-600">Resolved</p>
               <p className="text-2xl font-bold text-gray-800">
-                {reports.filter(r => r.status === 'Resolved').length}
+                {issues.filter(r => r.status === 'Resolved').length}
               </p>
             </div>
           </div>
@@ -202,7 +159,7 @@ const MyReports = () => {
             <div>
               <p className="text-sm text-gray-600">Total Points</p>
               <p className="text-2xl font-bold text-gray-800">
-                {reports.reduce((total, report) => total + report.points, 0)}
+                {filteredReports.reduce((total, report) => total + (report.points || 0), 0)}
               </p>
             </div>
           </div>
@@ -210,7 +167,11 @@ const MyReports = () => {
 
         {/* Reports List */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
-          {filteredReports.length === 0 ? (
+          {isLoading ? (
+            <div className="p-8 text-center">Loading your reports...</div>
+          ) : error ? (
+            <div className="p-8 text-center text-red-600">Error loading reports</div>
+          ) : filteredReports.length === 0 ? (
             <div className="p-8 text-center">
               <FiAlertCircle className="mx-auto text-gray-400 text-4xl mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-1">No reports found</h3>

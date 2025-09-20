@@ -97,7 +97,7 @@ export default function NavBarCitizen() {
             <Link to="/citizen" onClick={() => setMobileNavOpen(false)} className={`flex items-center gap-2 ${isActive("/citizen")}`}>
               <FaHome /> Dashboard
             </Link>
-            <Link to="/report" onClick={() => setMobileNavOpen(false)} className={`flex items-center gap-2 ${isActive("/report")}`}>
+            <Link to="/issuecard" onClick={() => setMobileNavOpen(false)} className={`flex items-center gap-2 ${isActive("/issuecard")}`}>
               <FaPlusCircle /> Report Issue
             </Link>
             <Link to="/my-issues" onClick={() => setMobileNavOpen(false)} className={`flex items-center gap-2 ${isActive("/my-issues")}`}>

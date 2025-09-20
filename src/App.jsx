@@ -49,6 +49,15 @@ export default function App() {
             </ProtectedRoute>
           } 
         />
+        {/* Alias for backward/alternate mobile link */}
+        <Route 
+          path="/report" 
+          element={
+            <ProtectedRoute>
+              <IssueCard />
+            </ProtectedRoute>
+          } 
+        />
         <Route 
           path="/map" 
           element={
