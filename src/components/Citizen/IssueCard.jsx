@@ -57,45 +57,43 @@ const IssueCard = () => {
     try {
       setCaptureMode(mode);
       setIsCapturing(true);
-      const stream = await navigator.mediaDevices.getUserMedia({ 
+      const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: mode === 'video'
       });
-      
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
       }
-    } catch (error) {
-      console.error("Error accessing camera:", error);
-      toast.error("Could not access camera. Please check permissions.");
+    } catch (err) {
+      console.error('Unable to access camera', err);
+      toast.error('Camera access denied or unavailable');
+      setIsCapturing(false);
+      setCaptureMode(null);
     }
   };
 
   const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-    }
+    if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
     setIsCapturing(false);
     setCaptureMode(null);
   };
 
   const capturePhoto = () => {
-    if (videoRef.current) {
-      const canvas = document.createElement('canvas');
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-      
-      canvas.toBlob(blob => {
-        const file = new File([blob], `issue-photo-${Date.now()}.jpg`, { type: 'image/jpeg' });
-  setMediaPreview(URL.createObjectURL(file));
-  setMediaFile(file);
-  setMediaType('image');
-        stopCamera();
-      }, 'image/jpeg', 0.8);
-    }
+    if (!videoRef.current) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob(blob => {
+      if (!blob) return;
+      const file = new File([blob], `issue-photo-${Date.now()}.jpg`, { type: 'image/jpeg' });
+      setMediaPreview(URL.createObjectURL(file));
+      setMediaFile(file);
+      setMediaType('image');
+      stopCamera();
+    }, 'image/jpeg', 0.85);
   };
 
   const startVideoRecording = () => {
@@ -149,15 +147,9 @@ const IssueCard = () => {
       const files = mediaFile ? [mediaFile] : [];
       await createIssue({
         files,
-        title,
-        description,
-        category,
-        urgency,
-        latitude,
-        longitude
+        formData: { title, description, category, urgency, latitude, longitude }
       });
 
-      // Reset form
       setTitle("");
       setDescription("");
       setCategory("Road Maintenance");
@@ -187,10 +179,10 @@ const IssueCard = () => {
     setDescription("");
     setCategory("Road Maintenance");
     setUrgency("Medium");
-  if (mediaPreview) URL.revokeObjectURL(mediaPreview);
-  setMediaPreview(null);
-  setMediaFile(null);
-  setMediaType(null);
+    if (mediaPreview) URL.revokeObjectURL(mediaPreview);
+    setMediaPreview(null);
+    setMediaFile(null);
+    setMediaType(null);
     setLocation("");
     setLatitude(null);
     setLongitude(null);

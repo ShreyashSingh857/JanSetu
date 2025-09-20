@@ -6,29 +6,23 @@ export function useCreateIssue() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ files = [], title, description, category, urgency, latitude, longitude }) => {
+    mutationFn: async ({ formData, files }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Prepare issue data to match DB schema fields
       const issueData = {
-        title,
-        description,
-        category,
-        urgency,
-        reporter_id: user.id,
-        latitude,
-        longitude,
-        status: 'open'
+        title: formData.title?.trim(),
+        description: formData.description?.trim(),
+        category: formData.category || 'General',
+        status: 'Reported',
+        latitude: formData.latitude || null,
+        longitude: formData.longitude || null,
+        reported_by: user.id,
       };
-
-      return createIssueWithMedia({ files, issueData });
+      return createIssueWithMedia({ files: files || [], issueData });
     },
-    onSuccess: (created) => {
-      // Invalidate list queries
+    onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['issues'] });
-      // Optionally seed cache for single issue
-      qc.setQueryData(['issue', created.id], created);
     }
   });
 }
