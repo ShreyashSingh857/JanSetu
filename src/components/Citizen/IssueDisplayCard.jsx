@@ -2,7 +2,7 @@
 import React from "react";
 import { FaThumbsUp, FaComment } from "react-icons/fa";
 
-const IssueDisplayCard = ({ issue }) => {
+const IssueDisplayCard = ({ issue, onToggleUpvote }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case "Resolved":
@@ -37,18 +37,20 @@ const IssueDisplayCard = ({ issue }) => {
       
       <div className="flex justify-between items-center mt-3">
         <div className="flex items-center space-x-4">
-          <div className="flex items-center">
-            <FaThumbsUp className="text-blue-500 mr-1" />
-            <span>{issue.upvotes}</span>
-          </div>
-          <div className="flex items-center">
-            <FaComment className="text-gray-500 mr-1" />
-            <span>{issue.comments}</span>
+          <button
+            onClick={() => onToggleUpvote && onToggleUpvote(issue.id)}
+            className={`flex items-center px-2 py-1 rounded-md text-sm border transition-colors ${issue.upvoted ? 'bg-blue-50 border-blue-400 text-blue-600' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'}`}
+          >
+            <FaThumbsUp className={`mr-1 ${issue.upvoted ? 'text-blue-600' : 'text-gray-500'}`} />
+            <span>{issue.upvote_count ?? 0}</span>
+          </button>
+          <div className="flex items-center text-gray-500">
+            <FaComment className="mr-1" />
+            <span>{issue.comments ?? 0}</span>
           </div>
         </div>
-        
         <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-xs">
-          {issue.category}
+          {issue.category || 'General'}
         </span>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   BarChart,
@@ -19,6 +19,8 @@ import {
   PolarRadiusAxis
 } from "recharts";
 import NavBarCitizen from "../components/Citizen/NavBarCitizen";
+import { useIssues } from "../hooks/useIssues";
+import { useToggleUpvote } from "../hooks/useToggleUpvote";
 
 // Status colors for consistency
 const STATUS_COLORS = {
@@ -30,59 +32,25 @@ const STATUS_COLORS = {
 const CitizenDashboard = () => {
   const [activeTab, setActiveTab] = useState("Reported");
   const [selectedFilter, setSelectedFilter] = useState("All");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { data: issues = [], isLoading } = useIssues();
+  const toggleUpvote = useToggleUpvote();
 
-  // Sample data for demonstration
-  const [issues, setIssues] = useState([
-    {
-      id: 1,
-      title: "Pothole on Main Street",
-      category: "Road Maintenance",
-      status: "In Progress",
-      date: "2025-09-05",
-      location: "Main Street, Downtown",
-      description: "Large pothole causing traffic issues",
-      upvotes: 15,
-      comments: 3,
-    },
-    {
-      id: 2,
-      title: "Broken Street Light",
-      category: "Electricity",
-      status: "Reported",
-      date: "2025-09-03",
-      location: "Oak Avenue",
-      description: "Street light not working for 3 days",
-      upvotes: 8,
-      comments: 1,
-    },
-    {
-      id: 3,
-      title: "Garbage Not Collected",
-      category: "Sanitation",
-      status: "Resolved",
-      date: "2025-08-28",
-      location: "Maple Road",
-      description: "Garbage not picked up for a week",
-      upvotes: 12,
-      comments: 5,
-    },
-  ]);
+  const stats = useMemo(() => {
+    const reported = issues.filter(i => i.status === 'Reported').length;
+    const inProgress = issues.filter(i => i.status === 'In Progress').length;
+    const resolved = issues.filter(i => i.status === 'Resolved').length;
+    const upvotes = issues.reduce((sum, i) => sum + (i.upvote_count || 0), 0);
+    return { reported, inProgress, resolved, upvotes };
+  }, [issues]);
 
-  const [stats, setStats] = useState({
-    reported: 8,
-    inProgress: 3,
-    resolved: 5,
-    upvotes: 35,
-  });
-
-  const [trendData, setTrendData] = useState([
-    { day: "Mon", reported: 2, resolved: 0 },
-    { day: "Tue", reported: 1, resolved: 1 },
-    { day: "Wed", reported: 3, resolved: 1 },
-    { day: "Thu", reported: 1, resolved: 2 },
-    { day: "Fri", reported: 1, resolved: 1 },
-  ]);
+  // Placeholder trend data (would be computed server-side or via time-series query)
+  const trendData = useMemo(() => [
+    { day: 'Mon', reported: Math.min(stats.reported, 2), resolved: Math.min(stats.resolved, 1) },
+    { day: 'Tue', reported: 1, resolved: 0 },
+    { day: 'Wed', reported: 2, resolved: 1 },
+    { day: 'Thu', reported: 1, resolved: 1 },
+    { day: 'Fri', reported: 1, resolved: 0 },
+  ], [stats]);
 
   // Filter options for issues
   const filterOptions = ["All", "MIDC", "MIDC Test", "Clandysia", "Chandysia", "Adagus"];
@@ -95,14 +63,14 @@ const CitizenDashboard = () => {
   ];
 
   // Radar chart data for issue categories
-  const categoryData = [
-    { subject: 'Infrastructure', A: 120, fullMark: 150 },
-    { subject: 'Sanitation', A: 98, fullMark: 150 },
-    { subject: 'Safety', A: 86, fullMark: 150 },
-    { subject: 'Transport', A: 99, fullMark: 150 },
-    { subject: 'Utilities', A: 85, fullMark: 150 },
-    { subject: 'Environment', A: 65, fullMark: 150 },
-  ];
+  const categoryData = useMemo(() => {
+    const counts = issues.reduce((acc, i) => {
+      const key = i.category || 'Other';
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+    return Object.entries(counts).map(([subject, count]) => ({ subject, A: count, fullMark: Math.max(...Object.values(counts)) || 1 }));
+  }, [issues]);
 
   // IssueDisplayCard component
   const IssueDisplayCard = ({ issue }) => {
@@ -140,18 +108,22 @@ const CitizenDashboard = () => {
         
         <div className="flex justify-between items-center mt-3">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center">
-              <span className="text-blue-500 mr-1">👍</span>
-              <span>{issue.upvotes}</span>
-            </div>
+            <button
+              onClick={() => toggleUpvote.mutate(issue.id)}
+              disabled={toggleUpvote.isLoading}
+              className={`flex items-center px-2 py-1 rounded-md text-sm border transition-colors ${issue.upvoted ? 'bg-blue-50 border-blue-400 text-blue-600' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'}`}
+            >
+              <span className={`mr-1 ${issue.upvoted ? 'text-blue-600' : 'text-gray-500'}`}>👍</span>
+              <span>{issue.upvote_count ?? 0}</span>
+            </button>
             <div className="flex items-center">
               <span className="text-gray-500 mr-1">💬</span>
-              <span>{issue.comments}</span>
+              <span>{issue.comments ?? 0}</span>
             </div>
           </div>
           
           <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-xs">
-            {issue.category}
+            {issue.category || 'General'}
           </span>
         </div>
       </div>
@@ -336,14 +308,14 @@ const CitizenDashboard = () => {
 
               {/* Issues list */}
               <div className="p-4 flex-grow overflow-auto">
-                {issues
+                {isLoading && <div className="text-center py-6 text-gray-500">Loading issues...</div>}
+                {!isLoading && issues
                   .filter((issue) => issue.status === activeTab && 
                           (selectedFilter === "All" || issue.location === selectedFilter))
                   .map((issue) => (
                     <IssueDisplayCard key={issue.id} issue={issue} />
                   ))}
-
-                {issues.filter((issue) => issue.status === activeTab && 
+                {!isLoading && issues.filter((issue) => issue.status === activeTab && 
                   (selectedFilter === "All" || issue.location === selectedFilter)).length === 0 && (
                   <div className="text-center py-12 text-gray-500">
                     <div className="text-4xl mb-4">🔍</div>

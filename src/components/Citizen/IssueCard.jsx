@@ -27,6 +27,7 @@ const IssueCard = () => {
   
   const videoRef = useRef(null);
   const streamRef = useRef(null);
+  const [facingMode, setFacingMode] = useState('environment');
   const navigate = useNavigate();
 
   const { mutateAsync: createIssue, isPending } = useCreateIssue();
@@ -57,10 +58,21 @@ const IssueCard = () => {
     try {
       setCaptureMode(mode);
       setIsCapturing(true);
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
+      const constraints = {
+        video: { facingMode },
         audio: mode === 'video'
-      });
+      };
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+      } catch (primaryErr) {
+        // Fallback without facingMode if not supported
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: mode === 'video' });
+        } catch (fallbackErr) {
+          throw primaryErr;
+        }
+      }
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
@@ -77,6 +89,17 @@ const IssueCard = () => {
     if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
     setIsCapturing(false);
     setCaptureMode(null);
+  };
+
+  const switchCamera = async () => {
+    // Toggle between user and environment
+    const next = facingMode === 'environment' ? 'user' : 'environment';
+    setFacingMode(next);
+    // Restart camera if already capturing
+    if (isCapturing && captureMode) {
+      stopCamera();
+      await startCamera(captureMode);
+    }
   };
 
   const capturePhoto = () => {
@@ -429,6 +452,14 @@ const IssueCard = () => {
                         className="p-3 bg-gray-500 text-white rounded-full hover:bg-gray-600 transition-colors"
                       >
                         <FaTimes className="text-xl" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={switchCamera}
+                        className="p-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
+                        title={facingMode === 'environment' ? 'Switch to Front Camera' : 'Switch to Back Camera'}
+                      >
+                        <span className="text-sm font-semibold">↺</span>
                       </button>
                     </div>
                   </div>

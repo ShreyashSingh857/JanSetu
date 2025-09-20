@@ -10,13 +10,33 @@ export async function listIssues({ status, category, search, reportedBy, assigne
   if (category && category !== 'All') query = query.eq('category', category);
   if (reportedBy) query = query.eq('reported_by', reportedBy);
   if (assignedTo) query = query.eq('assigned_to', assignedTo);
-  if (search) {
-    // Basic ILIKE filter on title OR description via PostgREST orFilter
-    query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
-  }
-  const { data, error } = await query;
+  if (search) query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
+
+  const { data: issues, error } = await query;
   if (error) throw error;
-  return data || [];
+  if (!issues?.length) return [];
+
+  const issueIds = issues.map(i => i.id);
+  const { data: upvotesData, error: upErr } = await supabase
+    .from('issue_upvotes')
+    .select('issue_id, user_id')
+    .in('issue_id', issueIds);
+  if (upErr) {
+    console.warn('Failed to load upvotes', upErr.message);
+    return issues.map(i => ({ ...i, upvote_count: 0, upvoted: false }));
+  }
+  const counts = {};
+  const userUpvoted = new Set();
+  const { data: { user } } = await supabase.auth.getUser();
+  upvotesData.forEach(row => {
+    counts[row.issue_id] = (counts[row.issue_id] || 0) + 1;
+    if (user && row.user_id === user.id) userUpvoted.add(row.issue_id);
+  });
+  return issues.map(i => ({
+    ...i,
+    upvote_count: counts[i.id] || 0,
+    upvoted: userUpvoted.has(i.id)
+  }));
 }
 
 export async function getIssue(id) {
@@ -40,9 +60,13 @@ export async function updateIssue(id, updates) {
   return data;
 }
 
-// Placeholder toggleUpvote – real implementation will use upvotes table / RPC later
 export async function toggleUpvote(issueId) {
-  console.warn('toggleUpvote not implemented against backend yet', issueId);
+  if (!supabase) throw new Error('Supabase client not configured');
+  const { data, error } = await supabase.rpc('toggle_upvote', { p_issue: issueId });
+  if (error) throw error;
+  // RPC returns array with one row (Supabase JS <2) or object depending; normalize
+  const row = Array.isArray(data) ? data[0] : data;
+  return { upvoted: row?.upvoted, total: row?.total };
 }
 
 export async function createIssueWithMedia({ files = [], issueData }) {
