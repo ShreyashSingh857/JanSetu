@@ -100,8 +100,8 @@ const IssueMarker = ({ issue }) => {
 function hashPoints(points) { let h=0; for (let i=0;i<points.length;i++){const p=points[i]; h=(h*31+((p[0]*1000)|0))|0; h=(h*31+((p[1]*1000)|0))|0; h=(h*31+((p[2]*100)|0))|0;} return h; }
 const HeatmapLayer = ({ data, intensityType }) => {
   const map = useMap();
-  const layerRef = React.useRef(null);
-  const lastHashRef = React.useRef(null);
+  const layerRef = useRef(null);
+  const lastHashRef = useRef(null);
   useEffect(() => {
     if (!data.length) { if (layerRef.current) { map.removeLayer(layerRef.current); layerRef.current=null; } return; }
     const pts = data.map(issue => {
