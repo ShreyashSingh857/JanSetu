@@ -40,14 +40,14 @@ export function AuthProvider({ children }) {
         setUser(newSession?.user ?? null);
         if (newSession?.user) {
           const intent = localStorage.getItem(ROLE_KEY);
-          if (intent) {
-            ensureProfile(newSession.user, intent).finally(() => {
-              if (window.location.pathname === '/' || window.location.pathname === '/login') {
-                window.location.replace(intent === 'citizen' ? '/citizen' : '/government');
-              }
-              localStorage.removeItem(ROLE_KEY);
-            });
-          }
+            if (intent) {
+              ensureProfile(newSession.user, intent).finally(() => {
+                if (window.location.pathname === '/' || window.location.pathname === '/login') {
+                  window.location.replace(intent === 'citizen' ? '/citizen' : '/government');
+                }
+                localStorage.removeItem(ROLE_KEY);
+              });
+            }
         }
       });
       return () => subscription.unsubscribe();
@@ -92,7 +92,11 @@ export function AuthProvider({ children }) {
     if (error) throw error;
   };
 
-  const signOut = async () => { if (supabase) await supabase.auth.signOut(); };
+  const signOut = async () => {
+    if (supabase) await supabase.auth.signOut();
+    // Clear auxiliary stored markers
+    ['userType','userEmail','userId','intent_role','isLoggedIn','pendingUserType'].forEach(k => localStorage.removeItem(k));
+  };
   const refreshUser = async () => { if (!supabase) return null; const { data } = await supabase.auth.getUser(); setUser(data.user); return data.user; };
 
   const value = { session, user, loading, initializing, signUp, signInWithPassword, signInWithGoogle, signOut, refreshUser };

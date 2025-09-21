@@ -20,16 +20,14 @@ export default function OAuthCallback() {
 
         const supaUser = session.user;
           console.log('[OAuthCallback] Session user id:', supaUser.id, 'email:', supaUser.email, 'metadata:', supaUser.user_metadata);
-        const storedType = localStorage.getItem('pendingUserType');
-        const intendedType = storedType || supaUser.user_metadata?.user_type || 'citizen';
-        const existingType = supaUser.user_metadata?.user_type;
+  // Standardize on intent_role for pre-OAuth role intent; fallback to stored user metadata.
+  const storedType = localStorage.getItem('intent_role');
+  const intendedType = storedType || supaUser.user_metadata?.user_type || 'citizen';
+  const existingType = supaUser.user_metadata?.user_type;
 
+        // If an account already has a user_type metadata set and user selected a different role, ignore intent and keep existing.
         if (existingType && storedType && existingType !== storedType) {
-          setStatus('Role mismatch – signing out');
-          await supabase.auth.signOut();
-          localStorage.removeItem('pendingUserType');
-          setError(`This account is registered as ${existingType}. Choose the correct role.`);
-          return;
+          console.info('Ignoring differing intent_role; preserving existing account role');
         }
 
         const userType = existingType || intendedType;
@@ -58,11 +56,11 @@ export default function OAuthCallback() {
         }
 
         // Store local login markers
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userType', userType);
-        localStorage.setItem('email', supaUser.email || '');
-        localStorage.setItem('userId', supaUser.id);
-        localStorage.removeItem('pendingUserType');
+  // Minimal persisted markers (avoid redundant scattered keys)
+  localStorage.setItem('userType', userType);
+  localStorage.setItem('userEmail', supaUser.email || '');
+  localStorage.setItem('userId', supaUser.id);
+  localStorage.removeItem('intent_role');
 
         setStatus('Redirecting...');
         setTimeout(() => {

@@ -7,6 +7,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import L from 'leaflet';
 import 'leaflet.heat';
 import "leaflet/dist/leaflet.css";
+import { normalizeStatus } from '../../lib/status';
 
 // Fix for default markers in react-leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -95,52 +96,28 @@ const IssueMarker = ({ issue }) => {
   return null;
 };
 
-// Heatmap layer component (aligned with citizen map logic: urgency | status | points)
+// Hash utility for heatmap point arrays
+function hashPoints(points) { let h=0; for (let i=0;i<points.length;i++){const p=points[i]; h=(h*31+((p[0]*1000)|0))|0; h=(h*31+((p[1]*1000)|0))|0; h=(h*31+((p[2]*100)|0))|0;} return h; }
 const HeatmapLayer = ({ data, intensityType }) => {
   const map = useMap();
-  
+  const layerRef = React.useRef(null);
+  const lastHashRef = React.useRef(null);
   useEffect(() => {
-    map.eachLayer(layer => {
-      if (layer.options && layer.options.heatmap) {
-        map.removeLayer(layer);
-      }
-    });
-
-    const heatmapPoints = data.map(issue => {
+    if (!data.length) { if (layerRef.current) { map.removeLayer(layerRef.current); layerRef.current=null; } return; }
+    const pts = data.map(issue => {
       let intensity;
-      if (intensityType === 'urgency') {
-        intensity = issue.urgency === 'Critical' ? 1.0 : issue.urgency === 'High' ? 0.75 : issue.urgency === 'Medium' ? 0.5 : 0.25;
-      } else if (intensityType === 'status') {
-        intensity = (issue.status === 'Reported' || issue.status === 'Pending') ? 0.4 : issue.status === 'In Progress' ? 0.7 : 0.9;
-      } else { // points (upvotes)
-        const base = issue.points || 0;
-        intensity = Math.min(base / 20, 1);
-        if (intensity === 0) intensity = 0.15; // faint visibility for zero-upvote items
-      }
+      if (intensityType==='urgency') intensity = issue.urgency === 'Critical' ? 1.0 : issue.urgency === 'High' ? 0.75 : issue.urgency === 'Medium' ? 0.5 : 0.25;
+      else if (intensityType==='status') intensity = (issue.status==='Reported'||issue.status==='Pending') ? 0.4 : issue.status==='In Progress' ? 0.7 : 0.9;
+      else { const base = issue.points||0; intensity = Math.min(base/20,1); if (intensity===0) intensity=0.15; }
       return [issue.lat, issue.lng, intensity];
     });
-
-    if (window.L && window.L.heatLayer) {
-      const heatmap = L.heatLayer(heatmapPoints, {
-        radius: 32,
-        blur: 22,
-        maxZoom: 18,
-        minOpacity: 0.25,
-        gradient: {
-          0.0: '#1d4ed8',
-          0.3: '#0ea5e9',
-          0.5: '#10b981',
-          0.7: '#f59e0b',
-          0.85: '#dc2626',
-          1.0: '#7f1d1d'
-        }
-      }).addTo(map);
-      
-      heatmap.options.heatmap = true;
-    }
-
+    const h = hashPoints(pts);
+    if (h === lastHashRef.current && layerRef.current) return; // unchanged
+    if (layerRef.current) { map.removeLayer(layerRef.current); layerRef.current=null; }
+    layerRef.current = L.heatLayer(pts, { radius:32, blur:22, maxZoom:18, minOpacity:0.25, gradient:{0.0:'#1d4ed8',0.3:'#0ea5e9',0.5:'#10b981',0.7:'#f59e0b',0.85:'#dc2626',1.0:'#7f1d1d'} }).addTo(map);
+    layerRef.current.options.heatmap = true;
+    lastHashRef.current = h;
   }, [data, intensityType, map]);
-
   return null;
 };
 
@@ -349,9 +326,9 @@ export default function MapView() {
   const stats = useMemo(() => {
     return {
       total: filteredIssues.length,
-      pending: filteredIssues.filter(issue => issue.status === "Pending" || issue.status === 'Reported').length,
-      inProgress: filteredIssues.filter(issue => issue.status === "In Progress").length,
-      resolved: filteredIssues.filter(issue => issue.status === "Resolved").length,
+      pending: filteredIssues.filter(issue => normalizeStatus(issue.status) === 'Pending').length,
+      inProgress: filteredIssues.filter(issue => normalizeStatus(issue.status) === 'In Progress').length,
+      resolved: filteredIssues.filter(issue => normalizeStatus(issue.status) === 'Resolved').length,
     };
   }, [filteredIssues]);
 

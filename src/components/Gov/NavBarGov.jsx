@@ -11,10 +11,13 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from '../../context/AuthContext';
 
 export default function NavBarGov() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const location = useLocation();
+  const { signOut, profile, user } = useAuth();
 
   // helper for active route
   const isActive = (path) =>
@@ -76,13 +79,44 @@ export default function NavBarGov() {
           </span>
         </div>
 
-        {/* Profile */}
-        <div className="flex items-center gap-2 cursor-pointer">
-          <div className="w-10 h-10 rounded-full bg-teal-500 text-white flex items-center justify-center font-bold">
-            AD
-          </div>
-          <span className="hidden sm:block text-gray-700 font-medium">Admin</span>
+        {/* Profile Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setDropdownOpen(o => !o)}
+            className="flex items-center gap-2 focus:outline-none"
+            aria-haspopup="true"
+            aria-expanded={dropdownOpen}
+          >
+            <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-teal-600 text-white text-sm font-semibold">
+              {(profile?.full_name || user?.user_metadata?.full_name || user?.user_metadata?.name || (user?.email ? user.email.split('@')[0] : 'U')).slice(0,1).toUpperCase()}
+            </span>
+            <span className="hidden sm:block text-gray-700 font-medium max-w-[160px] truncate">
+              {profile?.full_name || user?.user_metadata?.full_name || user?.user_metadata?.name || (user?.email ? user.email.split('@')[0] : 'User')}
+            </span>
+          </button>
+          {dropdownOpen && (
+            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 z-50 p-4">
+              <div className="mb-4">
+                <p className="text-sm font-semibold text-gray-800 leading-tight">{profile?.full_name || user?.user_metadata?.full_name || user?.user_metadata?.name || 'Unnamed User'}</p>
+                <p className="text-xs text-gray-500 break-all">{profile?.email || user?.email}</p>
+                <p className="text-[10px] mt-1 uppercase tracking-wide text-teal-600 font-semibold">{(profile?.user_type || user?.user_metadata?.user_type || 'citizen')}</p>
+              </div>
+              <button
+                onClick={() => { signOut(); }}
+                className="w-full text-sm px-3 py-2 rounded-md bg-red-500 text-white hover:bg-red-600"
+              >
+                Sign Out
+              </button>
+            </div>
+          )}
         </div>
+        {dropdownOpen && (
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setDropdownOpen(false)}
+            aria-hidden="true"
+          />
+        )}
 
         {/* Mobile Menu Button */}
         <button

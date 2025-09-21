@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import NavBarCitizen from './NavBarCitizen';
 import { useNavigate } from 'react-router-dom';
 import { useIssues } from '../../hooks/useIssues';
+import { normalizeStatus } from '../../lib/status';
 import { supabase } from '../../lib/supabase';
 
 const MyReports = () => {
@@ -45,7 +46,7 @@ const MyReports = () => {
       title: i.title,
       category: i.category,
       description: i.description,
-      status: i.status === 'Reported' ? 'Pending' : i.status, // map if needed for legacy labels
+      status: normalizeStatus(i.status),
       date: i.created_at,
       location: i.location || '—',
       urgency: i.urgency || 'Medium',

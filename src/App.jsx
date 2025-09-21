@@ -10,7 +10,7 @@ import MapView from './components/Gov/MapView';
 import ReportedIssues from './components/Gov/ReportedIssues';
 import IssueProgress from './components/Gov/IssueProgress';
 import IssueCard from './components/Citizen/IssueCard';
-import MapView1 from './components/Citizen/MapView1';
+import CitizenMapView from './components/Citizen/CitizenMapView';
 import Myreport from './components/Citizen/Myreport';
 import IssueDetail from './pages/IssueDetail';
 import 'leaflet/dist/leaflet.css';
@@ -63,7 +63,7 @@ export default function App() {
           path="/map" 
           element={
             <ProtectedRoute>
-              <MapView1 />
+              <CitizenMapView />
             </ProtectedRoute>
           } 
         />
